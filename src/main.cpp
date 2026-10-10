@@ -2,5 +2,10 @@
 
 auto main() -> int
 {
-    std::println("rtweekend...");
+    // test
+    rtweekend::u8 a = 3;
+    rtweekend::u8 b = 5;
+    rtweekend::u8 c = a + b;
+
+    std::println("rtweekend: {}", c);
 }

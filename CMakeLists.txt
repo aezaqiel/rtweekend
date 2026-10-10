@@ -21,6 +21,11 @@ PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 
+target_precompile_headers(${PROJECT_NAME}
+PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/core.hpp
+)
+
 if(WIN32)
     target_compile_definitions(${PROJECT_NAME}
     PRIVATE
