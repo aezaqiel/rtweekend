@@ -12,6 +12,8 @@ set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+add_subdirectory(thirdparty/glm)
+
 add_executable(${PROJECT_NAME}
     ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp
 
@@ -22,6 +24,11 @@ target_include_directories(${PROJECT_NAME}
 PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/src
     ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/stb
+)
+
+target_link_libraries(${PROJECT_NAME}
+PRIVATE
+    glm
 )
 
 target_precompile_headers(${PROJECT_NAME}
