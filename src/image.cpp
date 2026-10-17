@@ -12,9 +12,14 @@ namespace rtweekend {
 
     auto Image::set(usize x, usize y, const glm::vec3& rgb) -> void
     {
+        set(x, y, glm::vec4(rgb, 1.0f));
+    }
+
+    auto Image::set(usize x, usize y, const glm::vec4& rgba) -> void
+    {
         usize index = (x + y * m_width) * s_channels;
         for (usize i = 0; i < s_channels; ++i) {
-            m_buffer[index + i] = static_cast<u8>(rgb[i] * 255.0f);
+            m_buffer[index + i] = static_cast<u8>(rgba[i] * 255.0f);
         }
     }
 
