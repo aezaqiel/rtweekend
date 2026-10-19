@@ -8,7 +8,7 @@ namespace rtweekend {
     {
     }
 
-    auto Sphere::hit(const Ray& ray, f32 tmin, f32 tmax, HitRecord& record) const -> bool
+    auto Sphere::hit(const Ray& ray, Interval t, HitRecord& record) const -> bool
     {
         glm::vec3 oc = m_center - ray.origin();
 
@@ -23,9 +23,9 @@ namespace rtweekend {
         f32 sqrtd = std::sqrt(discriminant);
 
         f32 root = (-b - sqrtd) / (2.0f * a);
-        if (root <= tmin || root > tmax) {
+        if (!t.surrounds(root)) {
             root = (-b + sqrtd) / (2.0f * a);
-            if (root <= tmin || root > tmax) return false;
+            if (!t.surrounds(root)) return false;
         }
 
         record.distance = root;

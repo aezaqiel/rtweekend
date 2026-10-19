@@ -3,6 +3,7 @@
 #include <glm/glm.hpp>
 
 #include "ray.hpp"
+#include "interval.hpp"
 
 namespace rtweekend {
 
@@ -25,7 +26,7 @@ namespace rtweekend {
     public:
         virtual ~Hittable() = default;
 
-        virtual auto hit(const Ray& ray, f32 tmin, f32 tmax, HitRecord& record) const -> bool = 0;
+        virtual auto hit(const Ray& ray, Interval t, HitRecord& record) const -> bool = 0;
     };
 
 }

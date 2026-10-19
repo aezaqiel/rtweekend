@@ -2,14 +2,14 @@
 
 namespace rtweekend {
 
-    auto HittableList::hit(const Ray& ray, f32 tmin, f32 tmax, HitRecord& record) const -> bool
+    auto HittableList::hit(const Ray& ray, Interval t, HitRecord& record) const -> bool
     {
         HitRecord scratch;
         bool hit = false;
-        f32 closest = tmax;
+        f32 closest = t.max;
 
         for (const auto& hittable : m_hittables) {
-            if (hittable->hit(ray, tmin, closest, scratch)) {
+            if (hittable->hit(ray, Interval { t.min, closest }, scratch)) {
                 hit = true;
                 closest = scratch.distance;
                 record = scratch;

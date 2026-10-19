@@ -11,7 +11,7 @@ using namespace rtweekend;
 auto trace(const Ray& ray, const Hittable& world) -> glm::vec3
 {
     HitRecord record;
-    if (world.hit(ray, 0.001f, std::numeric_limits<f32>::infinity(), record)) {
+    if (world.hit(ray, Interval { 0.001f, std::numeric_limits<f32>::infinity() }, record)) {
         return 0.5f * (record.normal + 1.0f);
     }
 

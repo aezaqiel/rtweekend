@@ -16,9 +16,12 @@ add_subdirectory(thirdparty/glm)
 
 add_executable(${PROJECT_NAME}
     ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp
+
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/ray.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/interval.hpp
+
     ${CMAKE_CURRENT_SOURCE_DIR}/src/image.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/image.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/ray.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/camera.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/camera.cpp
 

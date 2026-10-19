@@ -18,7 +18,7 @@ namespace rtweekend {
             m_hittables.push_back(hittable);
         }
 
-        virtual auto hit(const Ray& ray, f32 tmin, f32 tmax, HitRecord& record) const -> bool override;
+        virtual auto hit(const Ray& ray, Interval t, HitRecord& record) const -> bool override;
 
     private:
         std::vector<std::shared_ptr<Hittable>> m_hittables;
