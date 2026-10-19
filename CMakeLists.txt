@@ -22,6 +22,12 @@ add_executable(${PROJECT_NAME}
     ${CMAKE_CURRENT_SOURCE_DIR}/src/camera.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/camera.cpp
 
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/hittable/hittable.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/hittable/hittable_list.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/hittable/hittable_list.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/hittable/sphere.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/hittable/sphere.cpp
+
     ${CMAKE_CURRENT_SOURCE_DIR}/src/impl/stb.cpp
 )
 

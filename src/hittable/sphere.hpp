@@ -1,0 +1,20 @@
+#pragma once
+
+#include "hittable.hpp"
+
+namespace rtweekend {
+
+    class Sphere : public Hittable
+    {
+    public:
+        Sphere(const glm::vec3& center, f32 radius);
+        virtual ~Sphere() = default;
+
+        virtual auto hit(const Ray& ray, f32 tmin, f32 tmax, HitRecord& record) const -> bool override;
+
+    private:
+        glm::vec3 m_center;
+        f32 m_radius;
+    };
+
+}

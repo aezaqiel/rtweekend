@@ -3,7 +3,9 @@
 namespace rtweekend {
 
     Camera::Camera(usize width, usize height, const glm::vec3& origin)
-        : m_width(width), m_height(height), m_origin(origin)
+        : m_width(width)
+        , m_height(height)
+        , m_origin(origin)
     {
         f32 aspect_ratio = static_cast<f32>(width) / static_cast<f32>(height);
 

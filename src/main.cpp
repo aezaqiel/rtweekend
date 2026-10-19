@@ -3,31 +3,31 @@
 #include "image.hpp"
 #include "camera.hpp"
 
+#include "hittable/hittable_list.hpp"
+#include "hittable/sphere.hpp"
+
 using namespace rtweekend;
 
-auto hit(const glm::vec3& center, f32 radius, const Ray& ray) -> bool
+auto trace(const Ray& ray, const Hittable& world) -> glm::vec3
 {
-    glm::vec3 oc = center - ray.origin();
-
-    f32 a = glm::dot(ray.direction(), ray.direction());
-    f32 b = -2.0f * glm::dot(ray.direction(), oc);
-    f32 c = glm::dot(oc, oc) - radius * radius;
-
-    f32 discriminant = b * b - 4.0f * a * c;
-
-    return (discriminant >= 0.0f);
-}
-
-auto trace(const Ray& ray) -> glm::vec3
-{
-    if (hit(glm::vec3(0.0f, 0.0f, -1.0f), 0.5f, ray)) {
-        return glm::vec3(0.8f, 0.2f, 0.8f);
+    HitRecord record;
+    if (world.hit(ray, 0.001f, std::numeric_limits<f32>::infinity(), record)) {
+        return 0.5f * (record.normal + 1.0f);
     }
 
     glm::vec3 dir = glm::normalize(ray.direction());
     f32 a = 0.5f * (dir.y + 1.0f);
 
     return glm::mix(glm::vec3(1.0f), glm::vec3(0.5f, 0.7f, 1.0f), a);
+}
+
+auto singular_sphere() -> HittableList
+{
+    HittableList world;
+    world.push(std::make_shared<Sphere>(glm::vec3(0.0f, 0.0f, -1.0f), 0.5f));
+    world.push(std::make_shared<Sphere>(glm::vec3(0.0f, -100.5f, -1.0f), 100.0f));
+
+    return world;
 }
 
 auto main() -> int
@@ -38,10 +38,13 @@ auto main() -> int
     Image image(image_width, image_height);
     Camera camera(image_width, image_height, glm::vec3(0.0f));
 
+    HittableList world;
+    world = singular_sphere();
+
     for (usize j = 0; j < image_height; ++j) {
         for (usize i = 0; i < image_width; ++i) {
             Ray ray = camera(i, j);
-            glm::vec3 sample = trace(ray);
+            glm::vec3 sample = trace(ray, world);
 
             image.set(i, j, sample);
         }

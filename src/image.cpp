@@ -5,7 +5,8 @@
 namespace rtweekend {
 
     Image::Image(usize width, usize height)
-        : m_width(width), m_height(height)
+        : m_width(width)
+        , m_height(height)
     {
         m_buffer.resize(m_width * m_height * s_channels, 0);
     }
