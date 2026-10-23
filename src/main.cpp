@@ -34,6 +34,7 @@ auto main() -> int
 {
     usize image_width = 1280;
     usize image_height = 720;
+    usize image_samples = 32;
 
     Image image(image_width, image_height);
     Camera camera(image_width, image_height, glm::vec3(0.0f));
@@ -43,10 +44,14 @@ auto main() -> int
 
     for (usize j = 0; j < image_height; ++j) {
         for (usize i = 0; i < image_width; ++i) {
-            Ray ray = camera(i, j);
-            glm::vec3 sample = trace(ray, world);
+            glm::vec3 sample(0.0f);
 
-            image.set(i, j, sample);
+            for (usize s = 0; s < image_samples; ++s) {
+                Ray ray = camera(i, j);
+                sample += trace(ray, world);
+            }
+
+            image.set(i, j, sample / static_cast<f32>(image_samples));
         }
     }
 

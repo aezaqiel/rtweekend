@@ -31,6 +31,8 @@ add_executable(${PROJECT_NAME}
     ${CMAKE_CURRENT_SOURCE_DIR}/src/hittable/sphere.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/hittable/sphere.cpp
 
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/prng/prng.hpp
+
     ${CMAKE_CURRENT_SOURCE_DIR}/src/impl/stb.cpp
 )
 

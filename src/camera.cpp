@@ -1,5 +1,7 @@
 #include "camera.hpp"
 
+#include "prng/prng.hpp"
+
 namespace rtweekend {
 
     Camera::Camera(usize width, usize height, const glm::vec3& origin)
@@ -24,8 +26,8 @@ namespace rtweekend {
 
     auto Camera::operator()(usize i, usize j) const -> Ray
     {
-        f32 u = static_cast<f32>(i);
-        f32 v = static_cast<f32>(j);
+        f32 u = static_cast<f32>(i) + (PRNG::sample<f32>() - 0.5f);
+        f32 v = static_cast<f32>(j) + (PRNG::sample<f32>() - 0.5f);
 
         glm::vec3 center = m_pixel00 + (u * m_u) + (v * m_v);
         glm::vec3 direction = center - m_origin;

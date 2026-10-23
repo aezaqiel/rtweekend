@@ -14,6 +14,13 @@ namespace rtweekend {
         inline auto contains(f32 x) const -> bool { return min <= x && x <= max; }
         inline auto surrounds(f32 x) const -> bool { return min < x && x < max; }
 
+        inline auto clamp(f32 x) const
+        {
+            if (x < min) return min;
+            if (x > max) return max;
+            return x;
+        }
+
         inline static constexpr auto empty() -> Interval
         {
             return {
