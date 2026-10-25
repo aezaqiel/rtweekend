@@ -6,7 +6,7 @@
 #include "hittable/hittable_list.hpp"
 #include "hittable/sphere.hpp"
 
-#include "sampler/independentsampler.hpp"
+#include "sampler/independent_sampler.hpp"
 
 #include "progress.hpp"
 
@@ -36,9 +36,9 @@ auto singular_sphere() -> HittableList
 
 auto main() -> int
 {
-    usize image_width = 1280;
-    usize image_height = 720;
-    usize image_samples = 32;
+    usize image_width = 400;
+    usize image_height = 300;
+    usize image_samples = 16;
 
     Image image(image_width, image_height);
     Camera camera(image_width, image_height, glm::vec3(0.0f));

@@ -1,4 +1,4 @@
-#include "independentsampler.hpp"
+#include "independent_sampler.hpp"
 
 #include <bit>
 
@@ -30,10 +30,10 @@ namespace rtweekend {
         (void)sample_u32();
     }
 
-    auto IndependentSampler::seed_pixel(usize px, usize py, usize ps, usize base) noexcept -> void
+    auto IndependentSampler::seed_pixel(usize px, usize py, usize ps) noexcept -> void
     {
         u64 const pixel_id = (static_cast<u64>(px) << 32) | static_cast<u64>(py);
-        u64 const s0 = splitmix64(pixel_id ^ base);
+        u64 const s0 = splitmix64(1);
         u64 const s1 = splitmix64(static_cast<u64>(ps) ^ s0);
         seed(s1, s0);
     }

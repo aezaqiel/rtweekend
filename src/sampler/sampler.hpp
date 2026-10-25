@@ -1,21 +1,28 @@
 #pragma once
 
-#include <concepts>
+#include <memory>
 #include <numbers>
 
 #include <glm/glm.hpp>
 
 namespace rtweekend {
 
-    template <typename S>
-    concept Sampler = requires(S& s, usize px, usize py, usize ps, u32 bound, f32 min, f32 max)
+    class Sampler
     {
-        { s.seed_pixel(px, py, ps) } noexcept -> std::same_as<void>;
-        { s.sample_u32() } noexcept -> std::same_as<u32>;
-        { s.sample_u32(bound) } noexcept -> std::same_as<u32>;
-        { s.sample_1d() } noexcept -> std::same_as<f32>;
-        { s.sample_2d() } noexcept -> std::same_as<glm::vec2>;
-        { s.uniform(min, max) } noexcept -> std::same_as<f32>;
+    public:
+        virtual ~Sampler() = default;
+
+        virtual auto seed_pixel(usize px, usize py, usize ps) noexcept -> void = 0;
+
+        [[nodiscard]] virtual auto sample_u32() noexcept -> u32 = 0;
+        [[nodiscard]] virtual auto sample_u32(u32 bound) noexcept -> u32 = 0;
+
+        [[nodiscard]] virtual auto sample_1d() noexcept -> f32 = 0;
+        [[nodiscard]] virtual auto sample_2d() noexcept -> glm::vec2 = 0;
+
+        [[nodiscard]] virtual auto uniform(f32 min, f32 max) noexcept -> f32 = 0;
+
+        [[nodiscard]] virtual auto clone() const -> std::unique_ptr<Sampler> = 0;
     };
 
     namespace warp {

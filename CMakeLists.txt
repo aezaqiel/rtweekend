@@ -32,8 +32,8 @@ add_executable(${PROJECT_NAME}
     ${CMAKE_CURRENT_SOURCE_DIR}/src/hittable/sphere.cpp
 
     ${CMAKE_CURRENT_SOURCE_DIR}/src/sampler/sampler.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/sampler/independentsampler.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/sampler/independentsampler.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/sampler/independent_sampler.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/sampler/independent_sampler.cpp
 
     ${CMAKE_CURRENT_SOURCE_DIR}/src/progress.hpp
 
