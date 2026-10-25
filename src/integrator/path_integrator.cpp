@@ -1,5 +1,7 @@
 #include "path_integrator.hpp"
 
+#include "material/material.hpp"
+
 namespace rtweekend {
 
     PathIntegrator::PathIntegrator(std::unique_ptr<Sampler> sampler, usize samples, usize depth)
@@ -8,7 +10,7 @@ namespace rtweekend {
     {
     }
 
-    [[nodiscard]] auto PathIntegrator::li(const Ray& ray, const Hittable& world) const -> glm::vec3
+    [[nodiscard]] auto PathIntegrator::li(const Ray& ray, const Hittable& world, Sampler& sampler) const -> glm::vec3
     {
         glm::vec3 radiance(0.0f);
         glm::vec3 throughput(1.0f);
@@ -27,8 +29,17 @@ namespace rtweekend {
                 break;
             }
 
-            // TODO: material
+            glm::vec3 attenuation;
+            Ray scattered;
 
+            MaterialSample sample = MaterialSample::from(sampler);
+
+            if (!record.material->scatter(r, record, sample, attenuation, scattered)) {
+                break;
+            }
+
+            throughput *= attenuation;
+            r = scattered;
         }
 
         return radiance;

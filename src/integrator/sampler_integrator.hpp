@@ -14,7 +14,7 @@ namespace rtweekend {
         virtual auto render(const Hittable& world, const Camera& camera, Image& image) const -> void override;
 
     protected:
-        [[nodiscard]] virtual auto li(const Ray& ray, const Hittable& world) const -> glm::vec3 = 0;
+        [[nodiscard]] virtual auto li(const Ray& ray, const Hittable& world, Sampler& sampler) const -> glm::vec3 = 0;
 
     protected:
         std::unique_ptr<Sampler> m_sampler;

@@ -9,13 +9,23 @@
 #include "hittable/hittable_list.hpp"
 #include "hittable/sphere.hpp"
 
+#include "material/lambertian.hpp"
+#include "material/metal.hpp"
+
 using namespace rtweekend;
 
-auto singular_sphere() -> HittableList
+auto spheres() -> HittableList
 {
+    auto ground_material = std::make_shared<Lambertian>(glm::vec3(0.8f, 0.8f, 0.2f));
+    auto center_material = std::make_shared<Lambertian>(glm::vec3(0.1f, 0.2f, 0.5f));
+    auto left_material = std::make_shared<Metal>(glm::vec3(0.8f, 0.8f, 0.8f));
+    auto right_material = std::make_shared<Metal>(glm::vec3(0.8f, 0.6f, 0.2f));
+
     HittableList world;
-    world.push(std::make_shared<Sphere>(glm::vec3(0.0f, 0.0f, -1.0f), 0.5f));
-    world.push(std::make_shared<Sphere>(glm::vec3(0.0f, -100.5f, -1.0f), 100.0f));
+    world.push(std::make_shared<Sphere>(glm::vec3( 0.0f, -100.5f, -1.0f), 100.0f, ground_material));
+    world.push(std::make_shared<Sphere>(glm::vec3( 0.0f,    0.0f, -1.2f),   0.5f, center_material));
+    world.push(std::make_shared<Sphere>(glm::vec3(-1.0f,    0.0f, -1.0f),   0.5f, left_material));
+    world.push(std::make_shared<Sphere>(glm::vec3( 1.0f,    0.0f, -1.0f),   0.5f, right_material));
 
     return world;
 }
@@ -43,7 +53,7 @@ auto main() -> int
     ThinLensCamera camera(camera_config);
 
     HittableList world;
-    world = singular_sphere();
+    world = spheres();
 
     auto sampler = std::make_unique<IndependentSampler>();
 

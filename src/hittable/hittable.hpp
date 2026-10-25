@@ -1,5 +1,7 @@
 #pragma once
 
+#include <memory>
+
 #include <glm/glm.hpp>
 
 #include "ray.hpp"
@@ -7,12 +9,16 @@
 
 namespace rtweekend {
 
+    class Material;
+
     struct HitRecord
     {
         glm::vec3 point;
         glm::vec3 normal;
         f32 distance;
         bool front_face;
+
+        std::shared_ptr<Material> material;
 
         inline auto set_normal(const Ray& r, const glm::vec3& n) -> void
         {

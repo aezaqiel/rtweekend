@@ -29,6 +29,12 @@ add_executable(${PROJECT_NAME}
     ${CMAKE_CURRENT_SOURCE_DIR}/src/hittable/sphere.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/hittable/sphere.cpp
 
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/material/material.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/material/lambertian.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/material/lambertian.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/material/metal.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/material/metal.cpp
+
     ${CMAKE_CURRENT_SOURCE_DIR}/src/camera/camera.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/camera/thinlens_camera.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/camera/thinlens_camera.cpp

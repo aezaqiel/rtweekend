@@ -33,7 +33,7 @@ namespace rtweekend {
 
                     Ray const ray = camera.genray(i, j, sample);
 
-                    radiance += li(ray, world);
+                    radiance += li(ray, world, *sampler);
                 }
 
                 radiance /= static_cast<f32>(m_samples);
