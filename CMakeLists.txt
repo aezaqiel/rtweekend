@@ -37,6 +37,8 @@ add_executable(${PROJECT_NAME}
     ${CMAKE_CURRENT_SOURCE_DIR}/src/sampler/independentsampler.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/sampler/independentsampler.cpp
 
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/progress.hpp
+
     ${CMAKE_CURRENT_SOURCE_DIR}/src/impl/stb.cpp
 )
 

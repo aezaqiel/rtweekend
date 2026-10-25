@@ -8,6 +8,8 @@
 
 #include "sampler/independentsampler.hpp"
 
+#include "progress.hpp"
+
 using namespace rtweekend;
 
 auto trace(const Ray& ray, const Hittable& world) -> glm::vec3
@@ -46,6 +48,8 @@ auto main() -> int
     HittableList world;
     world = singular_sphere();
 
+    ProgressBar progress(image_height);
+
     for (usize j = 0; j < image_height; ++j) {
         for (usize i = 0; i < image_width; ++i) {
             glm::vec3 sample(0.0f);
@@ -60,7 +64,10 @@ auto main() -> int
 
             image.set(i, j, sample / static_cast<f32>(image_samples));
         }
+
+        progress.update();
     }
+    progress.finish();
 
     image.save("image.png");
 }
