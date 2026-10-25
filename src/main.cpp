@@ -8,22 +8,9 @@
 
 #include "sampler/independent_sampler.hpp"
 
-#include "progress.hpp"
+#include "integrator/path_integrator.hpp"
 
 using namespace rtweekend;
-
-auto trace(const Ray& ray, const Hittable& world) -> glm::vec3
-{
-    HitRecord record;
-    if (world.hit(ray, Interval { 0.001f, std::numeric_limits<f32>::infinity() }, record)) {
-        return 0.5f * (record.normal + 1.0f);
-    }
-
-    glm::vec3 dir = glm::normalize(ray.direction());
-    f32 a = 0.5f * (dir.y + 1.0f);
-
-    return glm::mix(glm::vec3(1.0f), glm::vec3(0.5f, 0.7f, 1.0f), a);
-}
 
 auto singular_sphere() -> HittableList
 {
@@ -39,35 +26,18 @@ auto main() -> int
     usize image_width = 400;
     usize image_height = 300;
     usize image_samples = 16;
+    usize image_depth = 8;
 
     Image image(image_width, image_height);
     Camera camera(image_width, image_height, glm::vec3(0.0f));
 
-    IndependentSampler sampler;
+    auto sampler = std::make_unique<IndependentSampler>();
 
     HittableList world;
     world = singular_sphere();
 
-    ProgressBar progress(image_height);
-
-    for (usize j = 0; j < image_height; ++j) {
-        for (usize i = 0; i < image_width; ++i) {
-            glm::vec3 sample(0.0f);
-
-            for (usize s = 0; s < image_samples; ++s) {
-                sampler.seed_pixel(i, j, s);
-                glm::vec2 offset = sampler.sample_2d();
-
-                Ray ray = camera(i, j, offset);
-                sample += trace(ray, world);
-            }
-
-            image.set(i, j, sample / static_cast<f32>(image_samples));
-        }
-
-        progress.update();
-    }
-    progress.finish();
+    PathIntegrator integrator(std::move(sampler), image_samples, image_depth);
+    integrator.render(world, camera, image);
 
     image.save("image.png");
 }
