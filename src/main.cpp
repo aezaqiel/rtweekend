@@ -6,6 +6,8 @@
 #include "hittable/hittable_list.hpp"
 #include "hittable/sphere.hpp"
 
+#include "sampler/independentsampler.hpp"
+
 using namespace rtweekend;
 
 auto trace(const Ray& ray, const Hittable& world) -> glm::vec3
@@ -39,6 +41,8 @@ auto main() -> int
     Image image(image_width, image_height);
     Camera camera(image_width, image_height, glm::vec3(0.0f));
 
+    IndependentSampler sampler;
+
     HittableList world;
     world = singular_sphere();
 
@@ -47,7 +51,10 @@ auto main() -> int
             glm::vec3 sample(0.0f);
 
             for (usize s = 0; s < image_samples; ++s) {
-                Ray ray = camera(i, j);
+                sampler.seed_pixel(i, j, s);
+                glm::vec2 offset = sampler.sample_2d();
+
+                Ray ray = camera(i, j, offset);
                 sample += trace(ray, world);
             }
 

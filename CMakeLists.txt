@@ -33,6 +33,10 @@ add_executable(${PROJECT_NAME}
 
     ${CMAKE_CURRENT_SOURCE_DIR}/src/prng/prng.hpp
 
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/sampler/sampler.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/sampler/independentsampler.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/sampler/independentsampler.cpp
+
     ${CMAKE_CURRENT_SOURCE_DIR}/src/impl/stb.cpp
 )
 
@@ -59,11 +63,11 @@ if(WIN32)
     )
 endif()
 
-add_custom_command(
-    TARGET ${PROJECT_NAME}
-    POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        "${CMAKE_CURRENT_BINARY_DIR}/image.png"
-        "${CMAKE_CURRENT_SOURCE_DIR}/res/image.png"
-    COMMENT "copying output image to res"
-)
+# add_custom_command(
+#     TARGET ${PROJECT_NAME}
+#     POST_BUILD
+#     COMMAND ${CMAKE_COMMAND} -E copy_if_different
+#         "${CMAKE_CURRENT_BINARY_DIR}/image.png"
+#         "${CMAKE_CURRENT_SOURCE_DIR}/res/image.png"
+#     COMMENT "copying output image to res"
+# )

@@ -11,7 +11,7 @@ namespace rtweekend {
     public:
         explicit Camera(usize width, usize height, const glm::vec3& origin);
 
-        auto operator()(usize i, usize j) const -> Ray;
+        auto operator()(usize i, usize j, const glm::vec2& offset = { 0.5f, 0.5f }) const -> Ray;
 
     private:
         usize m_width { 0 };

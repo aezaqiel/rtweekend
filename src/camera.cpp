@@ -24,10 +24,10 @@ namespace rtweekend {
         m_pixel00 = m_origin - glm::vec3(0.0f, 0.0f, focal_length) - viewport_u / 2.0f - viewport_v / 2.0f + 0.5f * (m_u + m_v);
     }
 
-    auto Camera::operator()(usize i, usize j) const -> Ray
+    auto Camera::operator()(usize i, usize j, const glm::vec2& offset) const -> Ray
     {
-        f32 u = static_cast<f32>(i) + (PRNG::sample<f32>() - 0.5f);
-        f32 v = static_cast<f32>(j) + (PRNG::sample<f32>() - 0.5f);
+        f32 u = static_cast<f32>(i) + (offset.x - 0.5f);
+        f32 v = static_cast<f32>(j) + (offset.y - 0.5f);
 
         glm::vec3 center = m_pixel00 + (u * m_u) + (v * m_v);
         glm::vec3 direction = center - m_origin;
