@@ -1,7 +1,7 @@
 #pragma once
 
 #include "hittable/hittable.hpp"
-#include "camera.hpp"
+#include "camera/camera.hpp"
 #include "image.hpp"
 
 namespace rtweekend {

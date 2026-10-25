@@ -22,14 +22,16 @@ add_executable(${PROJECT_NAME}
 
     ${CMAKE_CURRENT_SOURCE_DIR}/src/image.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/image.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/camera.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/camera.cpp
 
     ${CMAKE_CURRENT_SOURCE_DIR}/src/hittable/hittable.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/hittable/hittable_list.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/hittable/hittable_list.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/hittable/sphere.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/hittable/sphere.cpp
+
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/camera/camera.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/camera/thinlens_camera.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/camera/thinlens_camera.cpp
 
     ${CMAKE_CURRENT_SOURCE_DIR}/src/sampler/sampler.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/sampler/independent_sampler.hpp

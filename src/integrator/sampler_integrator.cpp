@@ -25,8 +25,13 @@ namespace rtweekend {
                 for (usize s = 0; s < m_samples; ++s) {
                     sampler->seed_pixel(i, j, s);
 
-                    glm::vec2 const offset = sampler->sample_2d();
-                    Ray const ray = camera(i, j, offset);
+                    CameraSample sample {
+                        .offset = sampler->sample_2d(),
+                        .uv = sampler->sample_2d(),
+                        .time = sampler->sample_1d()
+                    };
+
+                    Ray const ray = camera.genray(i, j, sample);
 
                     radiance += li(ray, world);
                 }
