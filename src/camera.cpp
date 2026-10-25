@@ -1,7 +1,5 @@
 #include "camera.hpp"
 
-#include "prng/prng.hpp"
-
 namespace rtweekend {
 
     Camera::Camera(usize width, usize height, const glm::vec3& origin)
