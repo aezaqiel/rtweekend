@@ -41,8 +41,8 @@ namespace rtweekend {
     [[nodiscard]] auto ThinLensCamera::genray(usize i, usize j, const CameraSample& sample) const -> Ray
     {
         glm::vec2 const offset = sample.offset - 0.5f;
-        f32 const u = static_cast<f32>(i) + sample.offset.x;
-        f32 const v = static_cast<f32>(j) + sample.offset.y;
+        f32 const u = static_cast<f32>(i) + offset.x;
+        f32 const v = static_cast<f32>(j) + offset.y;
 
         glm::vec3 const target = m_pixel00 + (u * m_delta_u) + (v * m_delta_v);
 
