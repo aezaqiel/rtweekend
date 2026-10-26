@@ -34,6 +34,8 @@ add_executable(${PROJECT_NAME}
     ${CMAKE_CURRENT_SOURCE_DIR}/src/material/lambertian.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/material/metal.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/material/metal.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/material/dielectric.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/material/dielectric.cpp
 
     ${CMAKE_CURRENT_SOURCE_DIR}/src/camera/camera.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/camera/thinlens_camera.hpp

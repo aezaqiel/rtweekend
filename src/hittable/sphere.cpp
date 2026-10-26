@@ -4,7 +4,7 @@ namespace rtweekend {
 
     Sphere::Sphere(const glm::vec3& center, f32 radius, const std::shared_ptr<Material>& material)
         : m_center(center)
-        , m_radius(radius)
+        , m_radius(std::fmax(0.0f, radius))
         , m_material(material)
     {
     }
