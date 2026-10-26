@@ -62,6 +62,11 @@ PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/stb
 )
 
+target_compile_definitions(${PROJECT_NAME}
+PRIVATE
+    GLM_ENABLE_EXPERIMENTAL
+)
+
 target_link_libraries(${PROJECT_NAME}
 PRIVATE
     glm

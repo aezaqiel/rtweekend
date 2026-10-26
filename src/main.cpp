@@ -1,4 +1,8 @@
+#include <print>
+#include <chrono>
+
 #include <glm/glm.hpp>
+#include <glm/gtx/string_cast.hpp>
 
 #include "image.hpp"
 
@@ -86,14 +90,14 @@ auto book1(Sampler& sampler) -> HittableList
 
 auto main() -> int
 {
-    usize image_width = 400;
-    usize image_height = 300;
-    usize image_samples = 16;
-    usize image_depth = 8;
+    usize const image_width = 400;
+    usize const image_height = 300;
+    usize const image_samples = 32;
+    usize const image_depth = 8;
+
+    std::string const output_filename = "image.png";
 
     Image image(image_width, image_height);
-
-    auto sampler = std::make_unique<IndependentSampler>();
 
     // ThinLensCamera::Config camera_config {
     //     .width = image_width,
@@ -119,12 +123,38 @@ auto main() -> int
 
     ThinLensCamera camera(camera_config);
 
+    auto sampler = std::make_unique<IndependentSampler>();
+
     HittableList world;
     // world = spheres();
     world = book1(*sampler);
 
-    PathIntegrator integrator(std::move(sampler), image_samples, image_depth);
-    integrator.render(world, camera, image);
+    // pre-render diagnostics
+    usize const total_pixels = image_width * image_height;
+    u64 const total_samples = static_cast<u64>(total_pixels) * static_cast<u64>(image_samples);
 
-    image.save("image.png");
+    std::print("\033[1;36m=== Render Configuration ===\033[0m\n");
+    std::print("  Resolution      : {} x {} ({} pixels)\n", image_width, image_height, total_pixels);
+    std::print("  Samples         : {}\n", image_samples);
+    std::print("  Max Depth       : {}\n", image_depth);
+    std::print("  Camera FOV      : {:.1f} deg\n", camera_config.vfov);
+    std::print("  Look From -> At : {} -> {}\n", glm::to_string(camera_config.lookfrom), glm::to_string(camera_config.lookat));
+    std::print("  Focus / Defocus : focal = {:.1f}, angle = {:.2f} deg\n\n", camera_config.focal_length, camera_config.defocus_angle);
+
+    PathIntegrator integrator(std::move(sampler), image_samples, image_depth);
+
+    auto const start_time = std::chrono::steady_clock::now();
+    integrator.render(world, camera, image);
+    auto const end_time = std::chrono::steady_clock::now();
+
+    f64 const elapsed_sec = std::chrono::duration<f64>(end_time - start_time).count();
+    f64 const msamples_per_sec = (static_cast<f64>(total_samples) / 1e6) / std::max(elapsed_sec, 1e-9);
+
+    image.save(output_filename);
+
+    // post-render diagnostics
+    std::print("\n\033[1;32m=== Render Complete ===\033[0m\n");
+    std::print("  Render Time    : {:.2f}s\n", elapsed_sec);
+    std::print("  Throughput     : {:.2f} MSamples/s ({:.0f} pixels/s)\n", msamples_per_sec, static_cast<f64>(total_pixels) / std::max(elapsed_sec, 1e-9));
+    std::print("  Saved Output   : {}\n", output_filename);
 }

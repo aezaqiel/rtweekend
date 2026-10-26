@@ -23,7 +23,7 @@ namespace rtweekend {
         ProgressBar progress(height);
         std::atomic<usize> next_row { 0 };
 
-        usize const num_threads = std::max<usize>(1, std::thread::hardware_concurrency());
+        usize const num_threads = std::max<usize>(1, std::thread::hardware_concurrency() / 2);
 
         std::vector<std::jthread> workers;
         workers.reserve(num_threads);
