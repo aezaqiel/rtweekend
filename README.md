@@ -7,5 +7,5 @@ An implementation of Peter Shirley’s [_Ray Tracing in One Weekend_](https://ra
 ## 🖼️ Latest Output
 
 <p align="center">
-  <img src="./res/image.png" alt="Ray Tracing in One Weekend Final Scene" width="800"/>
+  <img src="./res/book1.png" alt="Ray Tracing in One Weekend Final Scene" width="800"/>
 </p>

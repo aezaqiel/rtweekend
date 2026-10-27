@@ -90,9 +90,9 @@ auto book1(Sampler& sampler) -> HittableList
 
 auto main() -> int
 {
-    usize const image_width = 400;
-    usize const image_height = 300;
-    usize const image_samples = 32;
+    usize const image_width = 3840;
+    usize const image_height = 2160;
+    usize const image_samples = 1024;
     usize const image_depth = 8;
 
     std::string const output_filename = "image.png";
