@@ -11,7 +11,7 @@ namespace rtweekend {
         virtual ~PathIntegrator() = default;
 
     private:
-        [[nodiscard]] virtual auto li(const Ray& ray, const Hittable& world, Sampler& sampler) const -> glm::vec3 override;
+        [[nodiscard]] virtual auto li(const Ray& ray, const Hittable& world, Sampler& sampler) const -> vec3 override;
 
     private:
         usize m_depth { 1 };

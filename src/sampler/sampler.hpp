@@ -3,8 +3,6 @@
 #include <memory>
 #include <numbers>
 
-#include <glm/glm.hpp>
-
 namespace rtweekend {
 
     class Sampler
@@ -17,53 +15,54 @@ namespace rtweekend {
         [[nodiscard]] virtual auto sample_u32() noexcept -> u32 = 0;
         [[nodiscard]] virtual auto sample_u32(u32 bound) noexcept -> u32 = 0;
 
-        [[nodiscard]] virtual auto sample_1d() noexcept -> f32 = 0;
-        [[nodiscard]] virtual auto sample_2d() noexcept -> glm::vec2 = 0;
+        [[nodiscard]] virtual auto sample_1d() noexcept -> real = 0;
+        [[nodiscard]] virtual auto sample_2d() noexcept -> vec2 = 0;
 
-        [[nodiscard]] virtual auto uniform(f32 min, f32 max) noexcept -> f32 = 0;
+        [[nodiscard]] virtual auto uniform(real min, real max) noexcept -> real = 0;
 
         [[nodiscard]] virtual auto clone() const -> std::unique_ptr<Sampler> = 0;
     };
 
     namespace warp {
 
-        [[nodiscard]] inline auto uniform_unit_sphere(const glm::vec2& u) noexcept -> glm::vec3
+        [[nodiscard]] inline auto uniform_unit_sphere(const vec2& u) noexcept -> vec3
         {
-            f32 const z = 1.0f - 2.0f * u.x;
-            f32 const r = std::sqrt(std::max(0.0f, 1.0f - z * z));
-            f32 const phi = 2.0f * std::numbers::pi_v<f32> * u.y;
-            return glm::vec3{ r * std::cos(phi), r * std::sin(phi), z };
+            real const z = 1.0 - 2.0 * u.x;
+            real const r = std::sqrt(std::max(0.0, 1.0 - z * z));
+            real const phi = 2.0 * std::numbers::pi_v<real> * u.y;
+            return vec3{ r * std::cos(phi), r * std::sin(phi), z };
         }
 
-        [[nodiscard]] inline auto concentric_unit_disk(const glm::vec2& u) noexcept -> glm::vec2
+        [[nodiscard]] inline auto concentric_unit_disk(const vec2& u) noexcept -> vec2
         {
-            glm::vec2 const u_offset = 2.0f * u - glm::vec2(1.0f, 1.0f);
-            if (u_offset.x == 0.0f && u_offset.y == 0.0f) {
-                return glm::vec2(0.0f, 0.0f);
+            vec2 const u_offset = 2.0 * u - vec2(1.0, 1.0);
+            if (u_offset.x == 0.0 && u_offset.y == 0.0) {
+                return vec2(0.0, 0.0);
             }
 
-            f32 theta = 0.0f;
-            f32 r = 0.0f;
+            real theta = 0.0;
+            real r = 0.0;
+
             if (std::abs(u_offset.x) > std::abs(u_offset.y)) {
                 r = u_offset.x;
-                theta = (std::numbers::pi_v<f32> / 4.0f) * (u_offset.y / u_offset.x);
+                theta = (std::numbers::pi_v<real> / 4.0) * (u_offset.y / u_offset.x);
             } else {
                 r = u_offset.y;
-                theta = (std::numbers::pi_v<f32> / 2.0f) - (std::numbers::pi_v<f32> / 4.0f) * (u_offset.x / u_offset.y);
+                theta = (std::numbers::pi_v<real> / 2.0) - (std::numbers::pi_v<real> / 4.0) * (u_offset.x / u_offset.y);
             }
-            return r * glm::vec2{ std::cos(theta), std::sin(theta) };
+            return r * vec2{ std::cos(theta), std::sin(theta) };
         }
 
-        [[nodiscard]] inline auto cosine_hemisphere(glm::vec2 u) noexcept -> glm::vec3
+        [[nodiscard]] inline auto cosine_hemisphere(vec2 u) noexcept -> vec3
         {
-            glm::vec2 const d = concentric_unit_disk(u);
-            f32 const z = std::sqrt(std::max(0.0f, 1.0f - d.x * d.x - d.y * d.y));
-            return glm::vec3{ d.x, d.y, z };
+            vec2 const d = concentric_unit_disk(u);
+            real const z = std::sqrt(std::max(0.0, 1.0 - d.x * d.x - d.y * d.y));
+            return vec3{ d.x, d.y, z };
         }
 
-        [[nodiscard]] constexpr auto cosine_hemisphere_pdf(f32 cos_theta) noexcept -> f32
+        [[nodiscard]] constexpr auto cosine_hemisphere_pdf(real cos_theta) noexcept -> real
         {
-            return cos_theta > 0.0f ? cos_theta * std::numbers::inv_pi_v<f32> : 0.0f;
+            return cos_theta > 0.0 ? cos_theta * std::numbers::inv_pi_v<real> : 0.0;
         }
 
     }

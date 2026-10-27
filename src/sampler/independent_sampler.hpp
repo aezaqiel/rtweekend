@@ -16,10 +16,10 @@ namespace rtweekend {
         [[nodiscard]] virtual auto sample_u32() noexcept -> u32 override;
         [[nodiscard]] virtual auto sample_u32(u32 bound) noexcept -> u32 override;
 
-        [[nodiscard]] virtual auto sample_1d() noexcept -> f32 override;
-        [[nodiscard]] virtual auto sample_2d() noexcept -> glm::vec2 override;
+        [[nodiscard]] virtual auto sample_1d() noexcept -> real override;
+        [[nodiscard]] virtual auto sample_2d() noexcept -> vec2 override;
 
-        [[nodiscard]] virtual auto uniform(f32 min, f32 max) noexcept -> f32 override;
+        [[nodiscard]] virtual auto uniform(real min, real max) noexcept -> real override;
 
         [[nodiscard]] inline virtual auto clone() const -> std::unique_ptr<Sampler> override
         {

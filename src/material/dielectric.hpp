@@ -7,16 +7,16 @@ namespace rtweekend {
     class Dielectric final : public Material
     {
     public:
-        Dielectric(f32 ri);
+        Dielectric(real ri);
         virtual ~Dielectric() = default;
 
-        virtual auto scatter(const Ray& ray, const HitRecord& record, const MaterialSample& sample, glm::vec3& attenuation, Ray& scattered) const -> bool override;
+        virtual auto scatter(const Ray& ray, const HitRecord& record, const MaterialSample& sample, vec3& attenuation, Ray& scattered) const -> bool override;
 
     private:
-        static auto reflectance(f32 cosine, f32 ri) noexcept -> f32;
+        static auto reflectance(real cosine, real ri) noexcept -> real;
 
     private:
-        f32 m_ri { 1.0f };
+        real m_ri { 1.0 };
     };
 
 }

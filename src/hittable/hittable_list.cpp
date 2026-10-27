@@ -6,7 +6,7 @@ namespace rtweekend {
     {
         HitRecord scratch;
         bool hit = false;
-        f32 closest = t.max;
+        real closest = t.max;
 
         for (const auto& hittable : m_hittables) {
             if (hittable->hit(ray, Interval { t.min, closest }, scratch)) {

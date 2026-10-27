@@ -37,7 +37,7 @@ namespace rtweekend {
                     if (j >= height) break;
 
                     for (usize i = 0; i < width; ++i) {
-                        glm::vec3 radiance(0.0f);
+                        vec3 radiance(0.0);
 
                         for (usize s = 0; s < m_samples; ++s) {
                             sampler->seed_pixel(i, j, s);
@@ -52,7 +52,7 @@ namespace rtweekend {
                             radiance += li(ray, world, *sampler);
                         }
 
-                        radiance /= static_cast<f32>(m_samples);
+                        radiance /= static_cast<real>(m_samples);
                         image.set(i, j, radiance);
                     }
 

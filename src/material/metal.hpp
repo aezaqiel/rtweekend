@@ -7,14 +7,14 @@ namespace rtweekend {
     class Metal final : public Material
     {
     public:
-        Metal(const glm::vec3& albedo, f32 fuzz = 0.0f);
+        Metal(const vec3& albedo, real fuzz = 0.0);
         virtual ~Metal() = default;
 
-        virtual auto scatter(const Ray& ray, const HitRecord& record, const MaterialSample& sample, glm::vec3& attenuation, Ray& scattered) const -> bool override;
+        virtual auto scatter(const Ray& ray, const HitRecord& record, const MaterialSample& sample, vec3& attenuation, Ray& scattered) const -> bool override;
 
     private:
-        glm::vec3 m_albedo;
-        f32 m_fuzz { 0.0f };
+        vec3 m_albedo;
+        real m_fuzz { 0.0 };
     };
 
 }

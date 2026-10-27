@@ -2,8 +2,6 @@
 
 #include <memory>
 
-#include <glm/glm.hpp>
-
 #include "ray.hpp"
 #include "interval.hpp"
 
@@ -13,16 +11,16 @@ namespace rtweekend {
 
     struct HitRecord
     {
-        glm::vec3 point;
-        glm::vec3 normal;
-        f32 distance;
-        bool front_face;
+        vec3 point {};
+        vec3 normal {};
+        real distance { 0.0 };
+        bool front_face { false };
 
         std::shared_ptr<Material> material;
 
-        inline auto set_normal(const Ray& r, const glm::vec3& n) -> void
+        inline auto set_normal(const Ray& r, const vec3& n) -> void
         {
-            front_face = glm::dot(r.direction(), n) < 0.0f;
+            front_face = glm::dot(r.direction(), n) < 0.0;
             normal = front_face ? n : -n;
         }
     };

@@ -61,21 +61,23 @@ namespace rtweekend {
         }
     }
 
-    [[nodiscard]] auto IndependentSampler::sample_1d() noexcept -> f32
+    [[nodiscard]] auto IndependentSampler::sample_1d() noexcept -> real
     {
-        return static_cast<f32>(sample_u32() >> 8U) * 0x1.0p-24f;
+        u64 const hi = static_cast<u64>(sample_u32() >> 5U); // 27 bits
+        u64 const lo = static_cast<u64>(sample_u32() >> 6U); // 26 bits
+        return static_cast<real>((hi << 26U) | lo) * 0x1.0p-53;
     }
 
-    [[nodiscard]] auto IndependentSampler::sample_2d() noexcept -> glm::vec2
+    [[nodiscard]] auto IndependentSampler::sample_2d() noexcept -> vec2
     {
-        f32 const u = sample_1d();
-        f32 const v = sample_1d();
-        return glm::vec2 { u, v };
+        real const u = sample_1d();
+        real const v = sample_1d();
+        return vec2 { u, v };
     }
 
-    [[nodiscard]] auto IndependentSampler::uniform(f32 min, f32 max) noexcept -> f32
+    [[nodiscard]] auto IndependentSampler::uniform(real min, real max) noexcept -> real
     {
-        f32 const res = min + sample_1d() * (max - min);
+        real const res = min + sample_1d() * (max - min);
         return std::min(res, std::nextafter(max, min));
     }
     

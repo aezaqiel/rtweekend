@@ -2,8 +2,6 @@
 
 #include <string>
 
-#include <glm/glm.hpp>
-
 namespace rtweekend {
 
     class Image
@@ -16,8 +14,8 @@ namespace rtweekend {
         inline auto height() const -> usize { return m_height; }
         inline auto channels() const -> usize { return s_channels; }
 
-        auto set(usize x, usize y, const glm::vec3& rgb) -> void;
-        auto set(usize x, usize y, const glm::vec4& rgba) -> void;
+        auto set(usize x, usize y, const vec3& rgb) -> void;
+        auto set(usize x, usize y, const vec4& rgba) -> void;
 
         auto save(const std::string& filename) -> void;
 

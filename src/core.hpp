@@ -3,6 +3,8 @@
 #include <cstdint>
 #include <cstddef>
 
+#include <glm/glm.hpp>
+
 namespace rtweekend {
 
     using u8 = std::uint8_t;
@@ -19,5 +21,11 @@ namespace rtweekend {
     using f64 = double;
 
     using usize = std::size_t;
+
+    using real = f64;
+
+    using vec2 = glm::dvec2;
+    using vec3 = glm::dvec3;
+    using vec4 = glm::dvec4;
 
 }

@@ -10,26 +10,26 @@ namespace rtweekend {
     {
     }
 
-    [[nodiscard]] auto PathIntegrator::li(const Ray& ray, const Hittable& world, Sampler& sampler) const -> glm::vec3
+    [[nodiscard]] auto PathIntegrator::li(const Ray& ray, const Hittable& world, Sampler& sampler) const -> vec3
     {
-        glm::vec3 radiance(0.0f);
-        glm::vec3 throughput(1.0f);
+        vec3 radiance(0.0);
+        vec3 throughput(1.0);
 
         Ray r = ray;
 
         for (usize depth = 0; depth < m_depth; ++depth) {
             HitRecord record;
 
-            if (!world.hit(r, Interval { 0.001f, std::numeric_limits<f32>::infinity() }, record)) {
-                glm::vec3 const dir = glm::normalize(r.direction());
-                f32 const a = 0.5f * (dir.y + 1.0f);
-                glm::vec3 const sky = glm::mix(glm::vec3(1.0f), glm::vec3(0.5f, 0.7f, 1.0f), a);
+            if (!world.hit(r, Interval { 1e-7, std::numeric_limits<real>::infinity() }, record)) {
+                vec3 const dir = glm::normalize(r.direction());
+                real const a = 0.5 * (dir.y + 1.0);
+                vec3 const sky = glm::mix(vec3(1.0), vec3(0.5, 0.7, 1.0), a);
 
                 radiance += throughput * sky;
                 break;
             }
 
-            glm::vec3 attenuation;
+            vec3 attenuation;
             Ray scattered;
 
             MaterialSample sample = MaterialSample::from(sampler);

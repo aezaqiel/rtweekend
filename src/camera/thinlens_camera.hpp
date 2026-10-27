@@ -11,12 +11,12 @@ namespace rtweekend {
         {
             usize width         { 1280 };
             usize height        { 720 };
-            f32 vfov            { 90.0f };
-            glm::vec3 lookfrom  { 0.0f, 0.0f, 0.0f };
-            glm::vec3 lookat    { 0.0f, 0.0f, -1.0f };
-            glm::vec3 vup       { 0.0f, 1.0f, 0.0f };
-            f32 defocus_angle   { 0.0f };
-            f32 focal_length    { 1.0f };
+            real vfov           { 90.0 };
+            vec3 lookfrom       { 0.0, 0.0,  0.0 };
+            vec3 lookat         { 0.0, 0.0, -1.0 };
+            vec3 vup            { 0.0, 1.0,  0.0 };
+            real defocus_angle  { 0.0 };
+            real focal_length   { 1.0 };
         };
 
     public:
@@ -29,18 +29,18 @@ namespace rtweekend {
         usize m_width { 0 };
         usize m_height { 0 };
 
-        glm::vec3 m_origin;
-        glm::vec3 m_pixel00;
-        glm::vec3 m_delta_u;
-        glm::vec3 m_delta_v;
+        vec3 m_origin;
+        vec3 m_pixel00;
+        vec3 m_delta_u;
+        vec3 m_delta_v;
 
-        glm::vec3 m_u;
-        glm::vec3 m_v;
-        glm::vec3 m_w;
+        vec3 m_u;
+        vec3 m_v;
+        vec3 m_w;
 
-        f32 m_defocus_angle { 0.0f };
-        glm::vec3 m_defocus_u;
-        glm::vec3 m_defocus_v;
+        real m_defocus_angle { 0.0 };
+        vec3 m_defocus_u;
+        vec3 m_defocus_v;
     };
 
 }
