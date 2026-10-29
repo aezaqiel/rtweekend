@@ -20,8 +20,8 @@ add_executable(${PROJECT_NAME}
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ray.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/interval.hpp
 
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/image.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/image.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/film/film.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/film/film.cpp
 
     ${CMAKE_CURRENT_SOURCE_DIR}/src/hittable/hittable.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/hittable/hittable_list.hpp

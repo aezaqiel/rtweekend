@@ -15,13 +15,18 @@ namespace rtweekend {
     {
     }
 
-    auto SamplerIntegrator::render(const Hittable& world, const Camera& camera, Image& image) const -> void
+    auto SamplerIntegrator::render(const Hittable& world, const Camera& camera, Film& film) const -> void
     {
-        usize const width = image.width();
-        usize const height = image.height();
+        usize const width = film.width();
+        usize const height = film.height();
 
-        ProgressBar progress(height);
-        std::atomic<usize> next_row { 0 };
+        constexpr usize tile_size = 16;
+        usize const tiles_x = (width  + tile_size - 1) / tile_size;
+        usize const tiles_y = (height + tile_size - 1) / tile_size;
+        usize const total_tiles = tiles_x * tiles_y;
+
+        ProgressBar progress(total_tiles);
+        std::atomic<usize> next_tile { 0 };
 
         usize const num_threads = std::max<usize>(1, std::thread::hardware_concurrency() / 2);
 
@@ -31,31 +36,44 @@ namespace rtweekend {
         for (usize t = 0; t < num_threads; ++t) {
             workers.emplace_back([&, this]() {
                 auto sampler = m_sampler->clone();
-
                 while (true) {
-                    usize const j = next_row.fetch_add(1, std::memory_order_relaxed);
-                    if (j >= height) break;
+                    usize const tile_idx = next_tile.fetch_add(1, std::memory_order_relaxed);
+                    if (tile_idx >= total_tiles) break;
 
-                    for (usize i = 0; i < width; ++i) {
-                        vec3 radiance(0.0);
+                    usize const tx = tile_idx % tiles_x;
+                    usize const ty = tile_idx / tiles_x;
+                    usize const x0 = tx * tile_size;
+                    usize const y0 = ty * tile_size;
+                    usize const x1 = std::min(x0 + tile_size, width);
+                    usize const y1 = std::min(y0 + tile_size, height);
 
-                        for (usize s = 0; s < m_samples; ++s) {
-                            sampler->seed_pixel(i, j, s);
+                    FilmTile tile = film.create_tile(x0, y0, x1, y1);
 
-                            CameraSample sample {
-                                .offset = sampler->sample_2d(),
-                                .uv = sampler->sample_2d(),
-                                .time = sampler->sample_1d()
-                            };
+                    for (usize j = y0; j < y1; ++j) {
+                        for (usize i = x0; i < x1; ++i) {
+                            for (usize s = 0; s < m_samples; ++s) {
+                                sampler->seed_pixel(i, j, s);
 
-                            Ray const ray = camera.genray(i, j, sample);
-                            radiance += li(ray, world, *sampler);
+                                CameraSample sample {
+                                    .offset = sampler->sample_2d(),
+                                    .uv = sampler->sample_2d(),
+                                    .time = sampler->sample_1d()
+                                };
+
+                                Ray const ray = camera.genray(i, j, sample);
+                                vec3 const radiance = li(ray, world, *sampler);
+
+                                vec2 const p_film {
+                                    static_cast<real>(i) + sample.offset.x,
+                                    static_cast<real>(j) + sample.offset.y
+                                };
+
+                                tile.add_sample(p_film, radiance);
+                            }
                         }
-
-                        radiance /= static_cast<real>(m_samples);
-                        image.set(i, j, radiance);
                     }
 
+                    film.merge_tile(tile);
                     progress.update();
                 }
             });

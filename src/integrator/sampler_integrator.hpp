@@ -11,7 +11,7 @@ namespace rtweekend {
         SamplerIntegrator(std::unique_ptr<Sampler> sampler, usize sample);
         virtual ~SamplerIntegrator() = default;
 
-        virtual auto render(const Hittable& world, const Camera& camera, Image& image) const -> void override;
+        virtual auto render(const Hittable& world, const Camera& camera, Film& film) const -> void override;
 
     protected:
         [[nodiscard]] virtual auto li(const Ray& ray, const Hittable& world, Sampler& sampler) const -> vec3 = 0;

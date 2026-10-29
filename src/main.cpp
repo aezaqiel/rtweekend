@@ -3,8 +3,6 @@
 
 #include <glm/gtx/string_cast.hpp>
 
-#include "image.hpp"
-
 #include "sampler/independent_sampler.hpp"
 #include "camera/thinlens_camera.hpp"
 #include "integrator/path_integrator.hpp"
@@ -89,14 +87,16 @@ auto book1(Sampler& sampler) -> HittableList
 
 auto main() -> int
 {
-    usize const image_width = 400;
-    usize const image_height = 300;
-    usize const image_samples = 32;
+    usize const image_width = 1920;
+    usize const image_height = 1080;
+    usize const image_samples = 1024;
     usize const image_depth = 8;
 
     std::string const output_filename = "image.png";
 
-    Image image(image_width, image_height);
+    // Image image(image_width, image_height);
+
+    Film film(image_width, image_height);
 
     // ThinLensCamera::Config camera_config {
     //     .width = image_width,
@@ -143,13 +143,14 @@ auto main() -> int
     PathIntegrator integrator(std::move(sampler), image_samples, image_depth);
 
     auto const start_time = std::chrono::steady_clock::now();
-    integrator.render(world, camera, image);
+    integrator.render(world, camera, film);
     auto const end_time = std::chrono::steady_clock::now();
 
     f64 const elapsed_sec = std::chrono::duration<f64>(end_time - start_time).count();
     f64 const msamples_per_sec = (static_cast<f64>(total_samples) / 1e6) / std::max(elapsed_sec, 1e-9);
 
-    image.save(output_filename);
+    film.save(output_filename);
+    // image.save(output_filename);
 
     // post-render diagnostics
     std::print("\n\033[1;32m=== Render Complete ===\033[0m\n");

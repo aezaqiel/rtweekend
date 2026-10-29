@@ -28,4 +28,7 @@ namespace rtweekend {
     using vec3 = glm::dvec3;
     using vec4 = glm::dvec4;
 
+    using mat3 = glm::dmat3;
+    using mat4 = glm::dmat4;
+
 }
