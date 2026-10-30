@@ -10,25 +10,22 @@
 #include "hittable/hittable_list.hpp"
 #include "hittable/sphere.hpp"
 
-#include "material/lambertian.hpp"
-#include "material/metal.hpp"
-#include "material/dielectric.hpp"
+#include "material/principled.hpp"
 
 using namespace rtweekend;
 
 auto spheres() -> HittableList
 {
-    auto ground_material = std::make_shared<Lambertian>(vec3(0.8, 0.8, 0.2));
-    auto center_material = std::make_shared<Dielectric>(1.5);
-    auto left_material = std::make_shared<Metal>(vec3(0.8, 0.8, 0.8));
-    auto right_material = std::make_shared<Metal>(vec3(0.8, 0.6, 0.2), 0.5);
+    auto ground_material = PrincipledBSDF::diffuse(vec3(0.8, 0.8, 0.2), 0.8);
+    auto center_material = PrincipledBSDF::dielectric(1.5);
+    auto left_material   = PrincipledBSDF::metal(vec3(0.8, 0.8, 0.8), 0.0);
+    auto right_material  = PrincipledBSDF::metal(vec3(0.8, 0.6, 0.2), 0.5);
 
     HittableList world;
     world.push(std::make_shared<Sphere>(vec3( 0.0, -100.5, -1.0), 100.0, ground_material));
     world.push(std::make_shared<Sphere>(vec3( 0.0,    0.0, -1.2),   0.5, center_material));
     world.push(std::make_shared<Sphere>(vec3(-1.0,    0.0, -1.0),   0.5, left_material));
     world.push(std::make_shared<Sphere>(vec3( 1.0,    0.0, -1.0),   0.5, right_material));
-
     return world;
 }
 
@@ -36,7 +33,7 @@ auto book1(Sampler& sampler) -> HittableList
 {
     HittableList world;
 
-    auto ground_material = std::make_shared<Lambertian>(vec3(0.5, 0.5, 0.5));
+    auto ground_material = PrincipledBSDF::diffuse(vec3(0.5, 0.5, 0.5), 0.9);
     world.push(std::make_shared<Sphere>(vec3(0.0, -1000.0, 0.0), 1000.0, ground_material));
 
     for (i32 a = -11; a < 11; ++a) {
@@ -51,21 +48,33 @@ auto book1(Sampler& sampler) -> HittableList
             if (glm::length(center - vec3(4.0, 0.2, 0.0)) > 0.9) {
                 std::shared_ptr<Material> sphere_material;
 
-                if (choose_mat < 0.8) {
+                if (choose_mat < 0.65) {
+                    // Matte / subsurface / sheen fabric
                     vec3 const c0(sampler.sample_1d(), sampler.sample_1d(), sampler.sample_1d());
                     vec3 const c1(sampler.sample_1d(), sampler.sample_1d(), sampler.sample_1d());
-                    vec3 const albedo = c0 * c1;
-                    sphere_material = std::make_shared<Lambertian>(albedo);
+                    sphere_material = std::make_shared<PrincipledBSDF>(PrincipledBSDF::Config {
+                        .base_color = c0 * c1,
+                        .roughness  = sampler.uniform(0.4, 1.0),
+                        .subsurface = sampler.uniform(0.0, 0.4),
+                        .specular   = 0.3,
+                        .sheen      = sampler.uniform(0.0, 0.5)
+                    });
+                } else if (choose_mat < 0.82) {
+                    // Glossy clearcoat plastic
+                    vec3 const albedo(sampler.sample_1d(), sampler.sample_1d(), sampler.sample_1d());
+                    sphere_material = PrincipledBSDF::plastic(albedo, sampler.uniform(0.05, 0.35), 1.0);
                 } else if (choose_mat < 0.95) {
+                    // Anisotropic / rough conductor
                     vec3 const albedo(
                         sampler.uniform(0.5, 1.0),
                         sampler.uniform(0.5, 1.0),
                         sampler.uniform(0.5, 1.0)
                     );
-                    real const fuzz = sampler.uniform(0.0, 0.5);
-                    sphere_material = std::make_shared<Metal>(albedo, fuzz);
+                    real const roughness = sampler.uniform(0.0, 0.5);
+                    sphere_material = PrincipledBSDF::metal(albedo, roughness, sampler.uniform(0.0, 0.8));
                 } else {
-                    sphere_material = std::make_shared<Dielectric>(1.5);
+                    // Smooth or frosted glass
+                    sphere_material = PrincipledBSDF::dielectric(1.5, sampler.uniform(0.0, 0.15));
                 }
 
                 world.push(std::make_shared<Sphere>(center, 0.2, sphere_material));
@@ -73,13 +82,20 @@ auto book1(Sampler& sampler) -> HittableList
         }
     }
 
-    auto material1 = std::make_shared<Dielectric>(1.5);
+    auto material1 = PrincipledBSDF::dielectric(1.5, 0.0);
     world.push(std::make_shared<Sphere>(vec3(0.0, 1.0, 0.0), 1.0, material1));
 
-    auto material2 = std::make_shared<Lambertian>(vec3(0.4, 0.2, 0.1));
+    auto material2 = std::make_shared<PrincipledBSDF>(PrincipledBSDF::Config {
+        .base_color          = vec3(0.4, 0.2, 0.1),
+        .roughness           = 0.35,
+        .subsurface          = 0.25,
+        .specular            = 0.5,
+        .clearcoat           = 1.0,
+        .clearcoat_roughness = 0.03
+    });
     world.push(std::make_shared<Sphere>(vec3(-4.0, 1.0, 0.0), 1.0, material2));
 
-    auto material3 = std::make_shared<Metal>(vec3(0.7, 0.6, 0.5), 0.0);
+    auto material3 = PrincipledBSDF::metal(vec3(0.7, 0.6, 0.5), 0.0);
     world.push(std::make_shared<Sphere>(vec3(4.0, 1.0, 0.0), 1.0, material3));
 
     return world;
@@ -87,46 +103,44 @@ auto book1(Sampler& sampler) -> HittableList
 
 auto main() -> int
 {
-    usize const image_width = 1920;
-    usize const image_height = 1080;
-    usize const image_samples = 1024;
+    usize const image_width = 400;
+    usize const image_height = 300;
+    usize const image_samples = 16384;
     usize const image_depth = 8;
 
     std::string const output_filename = "image.png";
 
-    // Image image(image_width, image_height);
-
     Film film(image_width, image_height);
-
-    // ThinLensCamera::Config camera_config {
-    //     .width = image_width,
-    //     .height = image_height,
-    //     .vfov = 90.0,
-    //     .lookfrom = { 0.0, 0.0, 0.0 },
-    //     .lookat = { 0.0, 0.0, -1.0 },
-    //     .vup = { 0.0, 1.0, 0.0 },
-    //     .defocus_angle = 0.0,
-    //     .focal_length = 1.0
-    // };
 
     ThinLensCamera::Config camera_config {
         .width = image_width,
         .height = image_height,
-        .vfov = 20.0,
-        .lookfrom = { 13.0, 2.0, 3.0 },
-        .lookat = { 0.0, 0.0, 0.0 },
+        .vfov = 90.0,
+        .lookfrom = { 0.0, 0.0, 0.0 },
+        .lookat = { 0.0, 0.0, -1.0 },
         .vup = { 0.0, 1.0, 0.0 },
-        .defocus_angle = 0.6,
-        .focal_length = 10.0
+        .defocus_angle = 0.0,
+        .focal_length = 1.0
     };
+
+    // ThinLensCamera::Config camera_config {
+    //     .width = image_width,
+    //     .height = image_height,
+    //     .vfov = 20.0,
+    //     .lookfrom = { 13.0, 2.0, 3.0 },
+    //     .lookat = { 0.0, 0.0, 0.0 },
+    //     .vup = { 0.0, 1.0, 0.0 },
+    //     .defocus_angle = 0.6,
+    //     .focal_length = 10.0
+    // };
 
     ThinLensCamera camera(camera_config);
 
     auto sampler = std::make_unique<IndependentSampler>();
 
     HittableList world;
-    // world = spheres();
-    world = book1(*sampler);
+    world = spheres();
+    // world = book1(*sampler);
 
     // pre-render diagnostics
     usize const total_pixels = image_width * image_height;
