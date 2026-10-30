@@ -1,5 +1,7 @@
 #include "path_integrator.hpp"
 
+#include <algorithm>
+
 #include "material/material.hpp"
 
 namespace rtweekend {
@@ -20,7 +22,7 @@ namespace rtweekend {
         for (usize depth = 0; depth < m_depth; ++depth) {
             HitRecord record;
 
-            if (!world.hit(r, Interval { 1e-7, std::numeric_limits<real>::infinity() }, record)) {
+            if (!world.hit(r, Interval { 0.0, std::numeric_limits<real>::infinity() }, record)) {
                 vec3 const dir = glm::normalize(r.direction());
                 real const a = 0.5 * (dir.y + 1.0);
                 vec3 const sky = glm::mix(vec3(1.0), vec3(0.5, 0.7, 1.0), a);
@@ -28,6 +30,14 @@ namespace rtweekend {
                 radiance += throughput * sky;
 
                 break;
+            }
+
+            if (!record.front_face && record.material != nullptr) {
+                vec3 const sigma_a = record.material->interior_sigma_a();
+                if (sigma_a.x > 0.0 || sigma_a.y > 0.0 || sigma_a.z > 0.0) {
+                    real const dist = record.distance * glm::length(r.direction());
+                    throughput *= glm::exp(-sigma_a * dist);
+                }
             }
 
             radiance += throughput * record.material->emission(record);
@@ -38,19 +48,19 @@ namespace rtweekend {
             if (!bsdf.has_value()) break;
 
             throughput *= bsdf->weight;
-            r = Ray(record.point, bsdf->direction);
 
-            // vec3 attenuation;
-            // Ray scattered;
+            if (depth >= 4) {
+                real const max_comp = std::max({ throughput.x, throughput.y, throughput.z });
+                if (max_comp <= 0.0) break;
 
-            // MaterialSample sample = MaterialSample::from(sampler);
+                real const survival = std::clamp(max_comp, 0.05, 0.95);
+                if (sampler.sample_1d() >= survival) break;
 
-            // if (!record.material->scatter(r, record, sample, attenuation, scattered)) {
-            //     break;
-            // }
+                throughput /= survival;
+            }
 
-            // throughput *= attenuation;
-            // r = scattered;
+            vec3 const origin = offset_ray_origin(record.point, record.normal, bsdf->direction);
+            r = Ray(origin, bsdf->direction);
         }
 
         return radiance;

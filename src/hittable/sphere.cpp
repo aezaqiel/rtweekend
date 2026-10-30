@@ -23,12 +23,15 @@ namespace rtweekend {
         // Hearn-Baker / Haines perpendicular projection discriminant:
         // Avoids catastrophic cancellation in (|oc|^2 - r^2) when |oc| >> r or |oc| ~ r
         vec3 const perp = oc - (h / a) * d;
-        real const discriminant = a * (r2 - glm::dot(perp, perp));
+        real const perp2 = glm::dot(perp, perp);
+        real const discriminant = a * (r2 - perp2);
 
         if (discriminant < 0.0) return false;
 
         real const sqrtd = std::sqrt(discriminant);
-        real const c = glm::dot(oc, oc) - r2;
+
+        real const len_oc = glm::length(oc);
+        real const c = (len_oc - m_radius) * (len_oc + m_radius);
 
         // Citardauq stable quadratic roots: avoids subtracting nearly equal h and sqrtd
         real const q = (h >= 0.0) ? (h + sqrtd) : (h - sqrtd);
@@ -50,9 +53,16 @@ namespace rtweekend {
         }
 
         record.distance = root;
-        record.point = ray(record.distance);
-        vec3 const normal = glm::normalize(root * d - oc);
-        record.set_normal(ray, normal);
+
+        vec3 const outward_normal = glm::normalize(root * d - oc);
+        record.point = m_center + m_radius * outward_normal;
+
+        real const xz_len2 = outward_normal.x * outward_normal.x + outward_normal.z * outward_normal.z;
+        vec3 const tangent = (xz_len2 > 1e-16)
+            ? vec3(-outward_normal.z, 0.0, outward_normal.x) / std::sqrt(xz_len2)
+            : vec3(1.0, 0.0, 0.0);
+
+        record.set_normal(ray, outward_normal, tangent);
         record.material = m_material;
 
         return true;

@@ -20,8 +20,10 @@ namespace rtweekend {
             real sheen_tint             { 0.5  };
             real clearcoat              { 0.0  };
             real clearcoat_roughness    { 0.03 };
+            real clearcoat_ior          { 1.5  };
             real ior                    { 1.5  };
             real spec_trans             { 0.0  };
+            real attenuation_distance   { 1.0  };
             vec3 emission               { 0.0, 0.0, 0.0 };
         };
     
@@ -31,7 +33,7 @@ namespace rtweekend {
 
         [[nodiscard]] static auto diffuse(const vec3& base_color, real roughness = 0.5, real subsurface = 0.0) -> std::shared_ptr<PrincipledBSDF>;
         [[nodiscard]] static auto metal(const vec3& base_color, real roughness = 0.0, real anisotropic = 0.0) -> std::shared_ptr<PrincipledBSDF>;
-        [[nodiscard]] static auto dielectric(real ior = 1.5, real roughness = 0.0, const vec3& base_color = vec3(1.0)) -> std::shared_ptr<PrincipledBSDF>;
+        [[nodiscard]] static auto dielectric(real ior = 1.5, real roughness = 0.0, const vec3& base_color = vec3(1.0), real attenuation_distance = 1.0) -> std::shared_ptr<PrincipledBSDF>;
         [[nodiscard]] static auto plastic(const vec3& base_color, real roughness = 0.15, real clearcoat = 0.5) -> std::shared_ptr<PrincipledBSDF>;
         [[nodiscard]] static auto emissive(const vec3& radiance) -> std::shared_ptr<PrincipledBSDF>;
 
@@ -42,6 +44,11 @@ namespace rtweekend {
         [[nodiscard]] virtual auto emission(const HitRecord& record) const noexcept -> vec3 override
         {
             return m_emission;
+        }
+
+        [[nodiscard]] virtual auto interior_sigma_a() const noexcept -> vec3 override
+        {
+            return m_sigma_a;
         }
 
     private:
@@ -72,13 +79,19 @@ namespace rtweekend {
         real m_sheen_tint           { 0.5  };
         real m_clearcoat            { 0.0  };
         real m_clearcoat_roughness  { 0.03 };
+        real m_clearcoat_ior        { 1.5  };
         real m_ior                  { 1.5  };
         real m_spec_trans           { 0.0  };
         vec3 m_emission             { 0.0, 0.0, 0.0 };
 
+        bool m_is_delta_mf          { false };
         real m_alpha_x              { 0.25  };
         real m_alpha_y              { 0.25  };
         real m_alpha_coat           { 0.001 };
+        real m_opaque_ior           { 1.5   };
+        vec3 m_conductor_eta        { 1.0, 1.0, 1.0 };
+        vec3 m_conductor_k          { 1.0, 1.0, 1.0 };
+        vec3 m_sigma_a              { 0.0, 0.0, 0.0 };
         vec3 m_tint                 { 1.0, 1.0, 1.0 };
         vec3 m_spec_tint_color      { 1.0, 1.0, 1.0 };
         vec3 m_sheen_color          { 1.0, 1.0, 1.0 };

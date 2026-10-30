@@ -103,44 +103,49 @@ auto book1(Sampler& sampler) -> HittableList
 
 auto main() -> int
 {
-    usize const image_width = 400;
-    usize const image_height = 300;
-    usize const image_samples = 16384;
-    usize const image_depth = 8;
+    // usize const image_width = 400;
+    // usize const image_height = 300;
+    // usize const image_samples = 32;
+    // usize const image_depth = 64;
+
+    usize const image_width = 1920;
+    usize const image_height = 1080;
+    usize const image_samples = 1024;
+    usize const image_depth = 128;
 
     std::string const output_filename = "image.png";
 
     Film film(image_width, image_height);
 
-    ThinLensCamera::Config camera_config {
-        .width = image_width,
-        .height = image_height,
-        .vfov = 90.0,
-        .lookfrom = { 0.0, 0.0, 0.0 },
-        .lookat = { 0.0, 0.0, -1.0 },
-        .vup = { 0.0, 1.0, 0.0 },
-        .defocus_angle = 0.0,
-        .focal_length = 1.0
-    };
-
     // ThinLensCamera::Config camera_config {
     //     .width = image_width,
     //     .height = image_height,
-    //     .vfov = 20.0,
-    //     .lookfrom = { 13.0, 2.0, 3.0 },
-    //     .lookat = { 0.0, 0.0, 0.0 },
+    //     .vfov = 90.0,
+    //     .lookfrom = { 0.0, 0.0, 0.0 },
+    //     .lookat = { 0.0, 0.0, -1.0 },
     //     .vup = { 0.0, 1.0, 0.0 },
-    //     .defocus_angle = 0.6,
-    //     .focal_length = 10.0
+    //     .defocus_angle = 0.0,
+    //     .focal_length = 1.0
     // };
+
+    ThinLensCamera::Config camera_config {
+        .width = image_width,
+        .height = image_height,
+        .vfov = 20.0,
+        .lookfrom = { 13.0, 2.0, 3.0 },
+        .lookat = { 0.0, 0.0, 0.0 },
+        .vup = { 0.0, 1.0, 0.0 },
+        .defocus_angle = 0.6,
+        .focal_length = 10.0
+    };
 
     ThinLensCamera camera(camera_config);
 
     auto sampler = std::make_unique<IndependentSampler>();
 
     HittableList world;
-    world = spheres();
-    // world = book1(*sampler);
+    // world = spheres();
+    world = book1(*sampler);
 
     // pre-render diagnostics
     usize const total_pixels = image_width * image_height;

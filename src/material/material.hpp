@@ -24,6 +24,25 @@ namespace rtweekend {
             b = vec3(d, sign + n.y * n.y * a, -n.y);
         }
 
+        explicit ShadingFrame(const HitRecord& record) noexcept
+            : n(record.normal)
+        {
+            vec3 const t_proj = record.tangent - glm::dot(record.tangent, n) * n;
+            real const len2 = glm::dot(t_proj, t_proj);
+
+            if (len2 > 1e-16) {
+                t = t_proj / std::sqrt(len2);
+                b = glm::cross(n, t);
+            } else {
+                real const sign = std::copysign(1.0, n.z);
+                real const a = -1.0 / (sign + n.z);
+                real const d = n.x * n.y * a;
+
+                t = vec3(1.0 + sign * n.z * n.z * a, sign * d, -sign * n.x);
+                b = vec3(d, sign + n.y * n.y * a, -n.y);
+            }
+        }
+
         [[nodiscard]] constexpr auto to_local(const vec3& v) const noexcept -> vec3
         {
             return vec3(glm::dot(v, t), glm::dot(v, b), glm::dot(v, n));
@@ -83,13 +102,18 @@ namespace rtweekend {
             return vec3(0.0);
         }
 
+        [[nodiscard]] virtual auto interior_sigma_a() const noexcept -> vec3
+        {
+            return vec3(0.0);
+        }
+
         virtual auto scatter(const Ray& ray, const HitRecord& record, const MaterialSample& sample, vec3& attenuation, Ray& scattered) const -> bool
         {
-            auto const bsdf_sample = this->sample(ray, record, sample);
-            if (!bsdf_sample.has_value()) return false;
+            auto const bsdf = this->sample(ray, record, sample);
+            if (!bsdf.has_value()) return false;
 
-            attenuation = bsdf_sample->weight;
-            scattered = Ray(record.point, bsdf_sample->direction);
+            attenuation = bsdf->weight;
+            scattered = Ray(offset_ray_origin(record.point, record.normal, bsdf->direction), bsdf->direction);
 
             return true;
         }

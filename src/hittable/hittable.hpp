@@ -13,15 +13,17 @@ namespace rtweekend {
     {
         vec3 point {};
         vec3 normal {};
+        vec3 tangent {};
         real distance { 0.0 };
         bool front_face { false };
 
         std::shared_ptr<Material> material;
 
-        inline auto set_normal(const Ray& r, const vec3& n) -> void
+        inline auto set_normal(const Ray& r, const vec3& n, const vec3& t = vec3(0.0)) -> void
         {
             front_face = glm::dot(r.direction(), n) < 0.0;
             normal = front_face ? n : -n;
+            tangent = t;
         }
     };
 

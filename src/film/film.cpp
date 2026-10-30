@@ -628,54 +628,6 @@ namespace rtweekend {
             hdr[i] = m_pixels[i].resolved_radiance() * m_exposure_scale;
         }
 
-        if (m_width >= 3 && m_height >= 3) {
-            std::vector<vec3> filtered = hdr;
-            std::vector<real> neighbor_lums;
-            neighbor_lums.reserve(8);
-
-            for (usize y = 0; y < m_height; ++y) {
-                for (usize x = 0; x < m_width; ++x) {
-                    usize const idx = x + y * m_width;
-                    real const center_lum = luminance(hdr[idx]);
-                    if (center_lum <= 1e-6) continue;
-
-                    real const pixel_sem = luminance(m_pixels[idx].standard_error()) * m_exposure_scale;
-                    if (m_pixels[idx].sample_count() >= 2 && pixel_sem < 1e-3) {
-                        continue; // Converged highlight
-                    }
-
-                    neighbor_lums.clear();
-                    for (i64 dy = -1; dy <= 1; ++dy) {
-                        for (i64 dx = -1; dx <= 1; ++dx) {
-                            if (dx == 0 && dy == 0) continue;
-                            i64 const nx = static_cast<i64>(x) + dx;
-                            i64 const ny = static_cast<i64>(y) + dy;
-                            if (nx >= 0 && nx < static_cast<i64>(m_width) && ny >= 0 && ny < static_cast<i64>(m_height)) {
-                                neighbor_lums.push_back(luminance(hdr[static_cast<usize>(nx) + static_cast<usize>(ny) * m_width]));
-                            }
-                        }
-                    }
-
-                    if (neighbor_lums.size() >= 3) {
-                        std::sort(neighbor_lums.begin(), neighbor_lums.end());
-                        real const median = neighbor_lums[neighbor_lums.size() / 2];
-
-                        std::vector<real> abs_devs = neighbor_lums;
-                        for (real& d : abs_devs) d = std::abs(d - median);
-                        std::sort(abs_devs.begin(), abs_devs.end());
-
-                        real const sigma_mad = 1.4826 * abs_devs[abs_devs.size() / 2] + 1e-4;
-                        real const max_allowed = median + 4.0 * sigma_mad;
-
-                        if (center_lum > max_allowed && center_lum > 4.0 * median) {
-                            filtered[idx] = hdr[idx] * (max_allowed / center_lum);
-                        }
-                    }
-                }
-            }
-            hdr = std::move(filtered);
-        }
-
         if (out_linear_hdr != nullptr) {
             *out_linear_hdr = hdr;
         }
