@@ -38,7 +38,7 @@ namespace rtweekend {
                 real const a = -1.0 / (sign + n.z);
                 real const d = n.x * n.y * a;
 
-                t = vec3(1.0 + sign * n.z * n.z * a, sign * d, -sign * n.x);
+                t = vec3(1.0 + sign * n.x * n.x * a, sign * d, -sign * n.x);
                 b = vec3(d, sign + n.y * n.y * a, -n.y);
             }
         }

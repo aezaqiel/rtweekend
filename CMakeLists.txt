@@ -23,21 +23,18 @@ add_executable(${PROJECT_NAME}
     ${CMAKE_CURRENT_SOURCE_DIR}/src/film/film.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/film/film.cpp
 
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/hittable/aabb.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/hittable/hittable.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/hittable/hittable_list.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/hittable/hittable_list.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/hittable/bvh.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/hittable/bvh.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/hittable/sphere.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/hittable/sphere.cpp
 
     ${CMAKE_CURRENT_SOURCE_DIR}/src/material/material.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/material/principled.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/material/principled.cpp
-    # ${CMAKE_CURRENT_SOURCE_DIR}/src/material/lambertian.hpp
-    # ${CMAKE_CURRENT_SOURCE_DIR}/src/material/lambertian.cpp
-    # ${CMAKE_CURRENT_SOURCE_DIR}/src/material/metal.hpp
-    # ${CMAKE_CURRENT_SOURCE_DIR}/src/material/metal.cpp
-    # ${CMAKE_CURRENT_SOURCE_DIR}/src/material/dielectric.hpp
-    # ${CMAKE_CURRENT_SOURCE_DIR}/src/material/dielectric.cpp
 
     ${CMAKE_CURRENT_SOURCE_DIR}/src/camera/camera.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/camera/thinlens_camera.hpp

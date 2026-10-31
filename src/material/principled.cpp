@@ -128,10 +128,11 @@ namespace rtweekend {
             if (wo.z <= 1e-6) return 0.0;
 
             static constexpr real s_nodes[4] = {
-                0.0950125098376374, 0.2816035507792589, 0.4580167776572274, 0.6178762444026438
+                0.1834346424956498, 0.5255324099163290, 0.7966664774136267, 0.9602898564975363
             };
+
             static constexpr real s_weights[4] = {
-                0.1894506104550685, 0.1826034150449236, 0.1691565193950025, 0.1495959888165768
+                0.3626837833783620, 0.3137066458778873, 0.2223810344533745, 0.1012285362903763
             };
 
             vec3 const vh = glm::normalize(vec3(ax * wo.x, ay * wo.y, wo.z));
@@ -160,14 +161,14 @@ namespace rtweekend {
             real integral = 0.0;
             for (int i = 0; i < 4; ++i) {
                 for (int sign_r : { -1, 1 }) {
-                    real const u_r = 0.5 + sign_r * s_nodes[i];
+                    real const u_r = 0.5 + 0.5 * sign_r * s_nodes[i];
                     real const r = std::sqrt(u_r);
-                    real const wr = s_weights[i];
+                    real const wr = 0.5 * s_weights[i];
                     for (int j = 0; j < 4; ++j) {
                         for (int sign_p : { -1, 1 }) {
-                            real const u_p = 0.5 + sign_p * s_nodes[j];
+                            real const u_p = 0.5 + 0.5 * sign_p * s_nodes[j];
                             real const phi = 2.0 * std::numbers::pi_v<real> * u_p;
-                            real const wp = s_weights[j];
+                            real const wp = 0.5 * s_weights[j];
                             integral += wr * wp * eval_vndf_point(r, phi);
                         }
                     }
