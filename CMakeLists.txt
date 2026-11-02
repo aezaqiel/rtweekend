@@ -32,6 +32,11 @@ add_executable(${PROJECT_NAME}
     ${CMAKE_CURRENT_SOURCE_DIR}/src/hittable/sphere.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/hittable/sphere.cpp
 
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/sky/sky.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/sky/hosek_wilkie_data.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/sky/hosek_wilkie.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/sky/hosek_wilkie.cpp
+
     ${CMAKE_CURRENT_SOURCE_DIR}/src/material/material.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/material/principled.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/material/principled.cpp

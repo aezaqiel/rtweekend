@@ -3,6 +3,7 @@
 #include <algorithm>
 
 #include "material/material.hpp"
+#include "sky/hosek_wilkie.hpp"
 
 namespace rtweekend {
 
@@ -19,9 +20,10 @@ namespace rtweekend {
     
     }
 
-    PathIntegrator::PathIntegrator(std::unique_ptr<Sampler> sampler, usize samples, usize depth)
+    PathIntegrator::PathIntegrator(std::unique_ptr<Sampler> sampler, usize samples, usize depth, std::shared_ptr<Sky> sky)
         : SamplerIntegrator(std::move(sampler), samples)
         , m_depth(depth)
+        , m_sky(sky != nullptr ? std::move(sky) : std::make_shared<HosekWilkieSky>())
     {
     }
 
@@ -41,10 +43,17 @@ namespace rtweekend {
 
             if (!world.hit(r, Interval { 0.0, std::numeric_limits<real>::infinity() }, record)) {
                 vec3 const dir = glm::normalize(r.direction());
-                real const a = 0.5 * (dir.y + 1.0);
-                vec3 const sky = glm::mix(vec3(1.0), vec3(0.5, 0.7, 1.0), a);
+                vec3 const sky_le = m_sky->eval(dir);
 
-                radiance += throughput * sky;
+                if (sky_le.x > 0.0 || sky_le.y > 0.0 || sky_le.z > 0.0) {
+                    if (depth == 0 || prev_is_delta) {
+                        radiance += throughput * sky_le;
+                    } else {
+                        real const pdf_sky = m_sky->pdf(dir);
+                        real const mis_w = power_heuristic(prev_bsdf_pdf, pdf_sky);
+                        radiance += throughput * sky_le * mis_w;
+                    }
+                }
 
                 break;
             }
@@ -91,6 +100,25 @@ namespace rtweekend {
 
                             radiance += throughput * f_bsdf * ls->emission * ((cos_theta_i * mis_w) / ls->pdf);
                         }
+                    }
+                }
+            }
+
+            real const u_sky_lobe = sampler.sample_1d();
+            vec2 const u_sky_dir = sampler.sample_2d();
+
+            if (auto const ss = m_sky->sample(u_sky_lobe, u_sky_dir); ss.has_value() && ss->pdf > 0.0) {
+                vec3 const f_bsdf = record.material->eval(wo_world, ss->wi, record);
+                if (f_bsdf.x > 0.0 || f_bsdf.y > 0.0 || f_bsdf.z > 0.0) {
+                    vec3 const shadow_origin = offset_ray_origin(record.point, record.normal, ss->wi);
+
+                    HitRecord shadow_hit;
+                    if (!world.hit(Ray(shadow_origin, ss->wi), Interval { 0.0, std::numeric_limits<real>::infinity() }, shadow_hit)) {
+                        real const pdf_bsdf = record.material->pdf(wo_world, ss->wi, record);
+                        real const mis_w = power_heuristic(ss->pdf, pdf_bsdf);
+                        real const cos_theta_i = std::abs(glm::dot(record.normal, ss->wi));
+
+                        radiance += throughput * f_bsdf * ss->radiance * ((cos_theta_i * mis_w) / ss->pdf);
                     }
                 }
             }

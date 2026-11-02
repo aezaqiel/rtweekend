@@ -13,6 +13,8 @@
 
 #include "material/principled.hpp"
 
+#include "sky/hosek_wilkie.hpp"
+
 using namespace rtweekend;
 
 auto spheres() -> HittableList
@@ -38,7 +40,7 @@ auto book1(Sampler& sampler) -> HittableList
     HittableList world;
 
     auto light_material  = PrincipledBSDF::emissive(vec3(15.0, 12.0, 8.0));
-    world.push(std::make_shared<Sphere>(vec3(0.0, 2.2, -1.0), 0.5, light_material));
+    // world.push(std::make_shared<Sphere>(vec3(0.0, 2.2, -1.0), 0.5, light_material));
 
     auto ground_material = PrincipledBSDF::diffuse(vec3(0.5, 0.5, 0.5), 0.9);
     world.push(std::make_shared<Sphere>(vec3(0.0, -1000.0, 0.0), 1000.0, ground_material));
@@ -110,15 +112,15 @@ auto book1(Sampler& sampler) -> HittableList
 
 auto main() -> int
 {
-    usize const image_width = 400;
-    usize const image_height = 300;
-    usize const image_samples = 32;
-    usize const image_depth = 64;
+    // usize const image_width = 400;
+    // usize const image_height = 300;
+    // usize const image_samples = 32;
+    // usize const image_depth = 64;
 
-    // usize const image_width = 1920;
-    // usize const image_height = 1080;
-    // usize const image_samples = 1024;
-    // usize const image_depth = 128;
+    usize const image_width = 1920;
+    usize const image_height = 1080;
+    usize const image_samples = 1024;
+    usize const image_depth = 128;
 
     std::string const output_filename = "image.png";
 
@@ -156,6 +158,17 @@ auto main() -> int
 
     BVH scene(world);
 
+    auto sky = std::make_shared<HosekWilkieSky>(HosekWilkieConfig {
+        .sun_direction = { 0.45, 0.38, 0.80 },
+        .turbidity = 2.5,
+        .ground_albedo = { 0.3, 0.3, 0.3 },
+        .sun_angular_radius_deg = 0.255,
+        .radiance_scale = 0.065,
+        .sun_intensity = 1.0,
+        .enable_sun_disc = true,
+        .enable_ground_bounce = true
+    });
+
     // pre-render diagnostics
     usize const total_pixels = image_width * image_height;
     u64 const total_samples = static_cast<u64>(total_pixels) * static_cast<u64>(image_samples);
@@ -168,7 +181,7 @@ auto main() -> int
     std::print("  Look From -> At : {} -> {}\n", glm::to_string(camera_config.lookfrom), glm::to_string(camera_config.lookat));
     std::print("  Focus / Defocus : focal = {:.1f}, angle = {:.2f} deg\n\n", camera_config.focal_length, camera_config.defocus_angle);
 
-    PathIntegrator integrator(std::move(sampler), image_samples, image_depth);
+    PathIntegrator integrator(std::move(sampler), image_samples, image_depth, sky);
 
     auto const start_time = std::chrono::steady_clock::now();
     integrator.render(scene, camera, film);
