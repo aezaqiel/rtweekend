@@ -20,8 +20,8 @@ namespace rtweekend {
     
     }
 
-    PathIntegrator::PathIntegrator(std::unique_ptr<Sampler> sampler, usize samples, usize depth, std::shared_ptr<Sky> sky)
-        : SamplerIntegrator(std::move(sampler), samples)
+    PathIntegrator::PathIntegrator(std::shared_ptr<Sampler> sampler, usize samples, usize depth, std::shared_ptr<Sky> sky)
+        : SamplerIntegrator(sampler, samples)
         , m_depth(depth)
         , m_sky(sky != nullptr ? std::move(sky) : std::make_shared<HosekWilkieSky>())
     {

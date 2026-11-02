@@ -1,8 +1,3 @@
-#include <print>
-#include <chrono>
-
-#include <glm/gtx/string_cast.hpp>
-
 #include "sampler/independent_sampler.hpp"
 #include "camera/thinlens_camera.hpp"
 #include "integrator/path_integrator.hpp"
@@ -17,29 +12,11 @@
 
 using namespace rtweekend;
 
-auto spheres() -> HittableList
-{
-    auto ground_material = PrincipledBSDF::diffuse(vec3(0.8, 0.8, 0.2), 0.8);
-    auto center_material = PrincipledBSDF::dielectric(1.5);
-    auto left_material   = PrincipledBSDF::metal(vec3(0.8, 0.8, 0.8), 0.0);
-    auto right_material  = PrincipledBSDF::metal(vec3(0.8, 0.6, 0.2), 0.5);
-    auto light_material  = PrincipledBSDF::emissive(vec3(15.0, 12.0, 8.0));
-
-    HittableList world;
-    world.push(std::make_shared<Sphere>(vec3( 0.0, -100.5, -1.0), 100.0, ground_material));
-    world.push(std::make_shared<Sphere>(vec3( 0.0,    0.0, -1.2),   0.5, center_material));
-    world.push(std::make_shared<Sphere>(vec3(-1.0,    0.0, -1.0),   0.5, left_material));
-    world.push(std::make_shared<Sphere>(vec3( 1.0,    0.0, -1.0),   0.5, right_material));
-    world.push(std::make_shared<Sphere>(vec3( 0.0,    2.2, -1.0),   0.5, light_material));
-
-    return world;
-}
-
 auto book1(Sampler& sampler) -> HittableList
 {
     HittableList world;
 
-    auto light_material  = PrincipledBSDF::emissive(vec3(15.0, 12.0, 8.0));
+    // auto light_material  = PrincipledBSDF::emissive(vec3(15.0, 12.0, 8.0));
     // world.push(std::make_shared<Sphere>(vec3(0.0, 2.2, -1.0), 0.5, light_material));
 
     auto ground_material = PrincipledBSDF::diffuse(vec3(0.5, 0.5, 0.5), 0.9);
@@ -112,32 +89,24 @@ auto book1(Sampler& sampler) -> HittableList
 
 auto main() -> int
 {
-    // usize const image_width = 400;
-    // usize const image_height = 300;
-    // usize const image_samples = 32;
-    // usize const image_depth = 64;
+    usize const image_width = 400;
+    usize const image_height = 300;
+    usize const image_samples = 32;
+    usize const image_depth = 64;
 
-    usize const image_width = 1920;
-    usize const image_height = 1080;
-    usize const image_samples = 1024;
-    usize const image_depth = 128;
+    // usize const image_width = 1920;
+    // usize const image_height = 1080;
+    // usize const image_samples = 1024;
+    // usize const image_depth = 128;
 
     std::string const output_filename = "image.png";
 
-    Film film(image_width, image_height);
+    auto film = std::make_shared<Film>(FilmConfig {
+        .width = image_width,
+        .height = image_height
+    });
 
-    // ThinLensCamera::Config camera_config {
-    //     .width = image_width,
-    //     .height = image_height,
-    //     .vfov = 90.0,
-    //     .lookfrom = { 0.0, 0.0, 0.0 },
-    //     .lookat = { 0.0, 0.0, -1.0 },
-    //     .vup = { 0.0, 1.0, 0.0 },
-    //     .defocus_angle = 0.0,
-    //     .focal_length = 1.0
-    // };
-
-    ThinLensCamera::Config camera_config {
+    auto camera = std::make_shared<ThinLensCamera>(ThinLensCameraConfig {
         .width = image_width,
         .height = image_height,
         .vfov = 20.0,
@@ -146,14 +115,11 @@ auto main() -> int
         .vup = { 0.0, 1.0, 0.0 },
         .defocus_angle = 0.6,
         .focal_length = 10.0
-    };
+    });
 
-    ThinLensCamera camera(camera_config);
-
-    auto sampler = std::make_unique<IndependentSampler>();
+    auto sampler = std::make_shared<IndependentSampler>();
 
     HittableList world;
-    // world = spheres();
     world = book1(*sampler);
 
     BVH scene(world);
@@ -169,33 +135,8 @@ auto main() -> int
         .enable_ground_bounce = true
     });
 
-    // pre-render diagnostics
-    usize const total_pixels = image_width * image_height;
-    u64 const total_samples = static_cast<u64>(total_pixels) * static_cast<u64>(image_samples);
+    auto integrator = std::make_shared<PathIntegrator>(sampler, image_samples, image_depth, sky);
+    integrator->render(scene, *camera, *film);
 
-    std::print("\033[1;36m=== Render Configuration ===\033[0m\n");
-    std::print("  Resolution      : {} x {} ({} pixels)\n", image_width, image_height, total_pixels);
-    std::print("  Samples         : {}\n", image_samples);
-    std::print("  Max Depth       : {}\n", image_depth);
-    std::print("  Camera FOV      : {:.1f} deg\n", camera_config.vfov);
-    std::print("  Look From -> At : {} -> {}\n", glm::to_string(camera_config.lookfrom), glm::to_string(camera_config.lookat));
-    std::print("  Focus / Defocus : focal = {:.1f}, angle = {:.2f} deg\n\n", camera_config.focal_length, camera_config.defocus_angle);
-
-    PathIntegrator integrator(std::move(sampler), image_samples, image_depth, sky);
-
-    auto const start_time = std::chrono::steady_clock::now();
-    integrator.render(scene, camera, film);
-    auto const end_time = std::chrono::steady_clock::now();
-
-    f64 const elapsed_sec = std::chrono::duration<f64>(end_time - start_time).count();
-    f64 const msamples_per_sec = (static_cast<f64>(total_samples) / 1e6) / std::max(elapsed_sec, 1e-9);
-
-    film.save(output_filename);
-    // image.save(output_filename);
-
-    // post-render diagnostics
-    std::print("\n\033[1;32m=== Render Complete ===\033[0m\n");
-    std::print("  Render Time    : {:.2f}s\n", elapsed_sec);
-    std::print("  Throughput     : {:.2f} MSamples/s ({:.0f} pixels/s)\n", msamples_per_sec, static_cast<f64>(total_pixels) / std::max(elapsed_sec, 1e-9));
-    std::print("  Saved Output   : {}\n", output_filename);
+    film->save(output_filename);
 }

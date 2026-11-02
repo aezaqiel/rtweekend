@@ -575,10 +575,10 @@ namespace rtweekend {
         }
     }
 
-    Film::Film(usize width, usize height, real exposure_ev)
-        : m_width(width)
-        , m_height(height)
-        , m_exposure_scale(std::exp2(exposure_ev))
+    Film::Film(const FilmConfig& config)
+        : m_width(config.width)
+        , m_height(config.height)
+        , m_exposure_scale(std::exp2(config.exposure_ev))
     {
         m_pixels.resize(m_width * m_height);
     }

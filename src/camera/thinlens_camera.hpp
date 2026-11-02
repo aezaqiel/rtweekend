@@ -4,23 +4,22 @@
 
 namespace rtweekend {
 
+    struct ThinLensCameraConfig
+    {
+        usize width         { 1280 };
+        usize height        { 720 };
+        real vfov           { 90.0 };
+        vec3 lookfrom       { 0.0, 0.0,  0.0 };
+        vec3 lookat         { 0.0, 0.0, -1.0 };
+        vec3 vup            { 0.0, 1.0,  0.0 };
+        real defocus_angle  { 0.0 };
+        real focal_length   { 1.0 };
+    };
+
     class ThinLensCamera final : public Camera
     {
     public:
-        struct Config
-        {
-            usize width         { 1280 };
-            usize height        { 720 };
-            real vfov           { 90.0 };
-            vec3 lookfrom       { 0.0, 0.0,  0.0 };
-            vec3 lookat         { 0.0, 0.0, -1.0 };
-            vec3 vup            { 0.0, 1.0,  0.0 };
-            real defocus_angle  { 0.0 };
-            real focal_length   { 1.0 };
-        };
-
-    public:
-        ThinLensCamera(const Config& config);
+        ThinLensCamera(const ThinLensCameraConfig& config);
         virtual ~ThinLensCamera() = default;
 
         [[nodiscard]] virtual auto genray(usize i, usize j, const CameraSample& sample = {}) const -> Ray override;

@@ -63,10 +63,18 @@ namespace rtweekend {
         std::vector<PixelAccumulator> m_pixels;
     };
 
+    struct FilmConfig
+    {
+        usize width;
+        usize height;
+        real exposure_ev { 0.0 };
+    };
+
     class Film
     {
     public:
-        Film(usize width, usize height, real exposure_ev = 0.0);
+        Film(const FilmConfig& config);
+        ~Film() = default;
 
         Film(const Film&) = delete;
         auto operator=(const Film&) -> Film& = delete;

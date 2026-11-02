@@ -9,8 +9,8 @@
 
 namespace rtweekend {
 
-    SamplerIntegrator::SamplerIntegrator(std::unique_ptr<Sampler> sampler, usize sample)
-        : m_sampler(std::move(sampler))
+    SamplerIntegrator::SamplerIntegrator(std::shared_ptr<Sampler> sampler, usize sample)
+        : m_sampler(sampler)
         , m_samples(sample)
     {
     }

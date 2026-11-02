@@ -8,7 +8,7 @@ namespace rtweekend {
     class SamplerIntegrator : public Integrator
     {
     public:
-        SamplerIntegrator(std::unique_ptr<Sampler> sampler, usize sample);
+        SamplerIntegrator(std::shared_ptr<Sampler> sampler, usize sample);
         virtual ~SamplerIntegrator() = default;
 
         virtual auto render(const Hittable& world, const Camera& camera, Film& film) const -> void override;
@@ -17,7 +17,7 @@ namespace rtweekend {
         [[nodiscard]] virtual auto li(const Ray& ray, const Hittable& world, Sampler& sampler) const -> vec3 = 0;
 
     protected:
-        std::unique_ptr<Sampler> m_sampler;
+        std::shared_ptr<Sampler> m_sampler;
         usize m_samples { 1 };
     };
 

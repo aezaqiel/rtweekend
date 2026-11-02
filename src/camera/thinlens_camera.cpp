@@ -6,7 +6,7 @@
 
 namespace rtweekend {
 
-    ThinLensCamera::ThinLensCamera(const Config& config)
+    ThinLensCamera::ThinLensCamera(const ThinLensCameraConfig& config)
         : m_width(config.width)
         , m_height(config.height)
         , m_origin(config.lookfrom)
