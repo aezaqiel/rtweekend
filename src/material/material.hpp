@@ -1,7 +1,5 @@
 #pragma once
 
-#include <optional>
-
 #include "hittable/hittable.hpp"
 #include "sampler/sampler.hpp"
 
@@ -77,45 +75,6 @@ namespace rtweekend {
         bool is_delta   { false };
     };
 
-    class Material
-    {
-    public:
-        virtual ~Material() = default;
-
-        [[nodiscard]] virtual auto sample(const Ray& ray, const HitRecord& record, const MaterialSample& sample) const -> std::optional<BSDFSample>
-        {
-            return std::nullopt;
-        }
-
-        [[nodiscard]] virtual auto eval(const vec3& wo_world, const vec3& wi_world, const HitRecord& record) const -> vec3
-        {
-            return vec3(0.0);
-        }
-
-        [[nodiscard]] virtual auto pdf(const vec3& wo_world, const vec3& wi_world, const HitRecord& record) const -> real
-        {
-            return 0.0;
-        }
-
-        [[nodiscard]] virtual auto emission(const HitRecord& record) const noexcept -> vec3
-        {
-            return vec3(0.0);
-        }
-
-        [[nodiscard]] virtual auto interior_sigma_a() const noexcept -> vec3
-        {
-            return vec3(0.0);
-        }
-
-        virtual auto scatter(const Ray& ray, const HitRecord& record, const MaterialSample& sample, vec3& attenuation, Ray& scattered) const -> bool
-        {
-            auto const bsdf = this->sample(ray, record, sample);
-            if (!bsdf.has_value()) return false;
-
-            attenuation = bsdf->weight;
-            scattered = Ray(offset_ray_origin(record.point, record.normal, bsdf->direction), bsdf->direction);
-
-            return true;
-        }
-    };
 }
+
+#include "principled.hpp"

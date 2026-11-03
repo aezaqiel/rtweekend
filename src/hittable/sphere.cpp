@@ -4,10 +4,10 @@
 
 namespace rtweekend {
 
-    Sphere::Sphere(const vec3& center, real radius, const std::shared_ptr<Material>& material)
+    Sphere::Sphere(const vec3& center, real radius, const std::shared_ptr<const PrincipledBSDF>& material)
         : m_center(center)
         , m_radius(std::max(0.0, radius))
-        , m_material(material)
+        , m_material(std::move(material))
     {
     }
 
@@ -65,7 +65,7 @@ namespace rtweekend {
             : vec3(1.0, 0.0, 0.0);
 
         record.set_normal(ray, outward_normal, tangent);
-        record.material = m_material;
+        record.material = m_material.get();
 
         return true;
     }

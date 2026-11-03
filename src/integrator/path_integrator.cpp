@@ -58,16 +58,16 @@ namespace rtweekend {
                 break;
             }
 
-            if (!record.front_face && record.material != nullptr) {
-                vec3 const sigma_a = record.material->interior_sigma_a();
-                if (sigma_a.x > 0.0 || sigma_a.y > 0.0 || sigma_a.z > 0.0) {
-                    real const dist = record.distance * glm::length(r.direction());
-                    throughput *= glm::exp(-sigma_a * dist);
-                }
+            if (record.material == nullptr) break;
+            const PrincipledBSDF& material = *record.material;
+
+            if (!record.front_face & material.has_medium()) {
+                real const dist = record.distance * glm::length(r.direction());
+                throughput *= glm::exp(-material.interior_sigma_a() * dist);
             }
 
-            vec3 const le = record.material->emission(record);
-            if (le.x > 0.0 || le.y > 0.0 || le.z > 0.0) {
+            if (material.is_emissive()) {
+                vec3 const& le = material.emission();
                 if (depth == 0 || prev_is_delta) {
                     radiance += throughput * le;
                 } else {
@@ -79,52 +79,56 @@ namespace rtweekend {
                 }
             }
 
-            vec3 const wo_world = -glm::normalize(r.direction());
+            if (material.has_non_delta_lobes()) {
+                vec3 const wo_world = -glm::normalize(r.direction());
 
-            if (world.is_emissive()) {
-                real const u_light = sampler.sample_1d();
-                vec2 const u_dir = sampler.sample_2d();
+                if (world.is_emissive()) {
+                    real const u_light = sampler.sample_1d();
+                    vec2 const u_dir = sampler.sample_2d();
 
-                if (auto const ls = world.sample_solid_angle(record.point, u_light, u_dir); ls.has_value() && ls->pdf > 0.0) {
-                    vec3 const f_bsdf = record.material->eval(wo_world, ls->wi, record);
+                    if (auto const ls = world.sample_solid_angle(record.point, u_light, u_dir); ls.has_value() && ls->pdf > 0.0) {
+                        vec3 const f_bsdf = material.eval(wo_world, ls->wi, record);
+
+                        if (f_bsdf.x > 0.0 || f_bsdf.y > 0.0 || f_bsdf.z > 0.0) {
+                            vec3 const shadow_origin = offset_ray_origin(record.point, record.normal, ls->wi);
+                            vec3 const shadow_target = offset_ray_origin(ls->point, ls->normal, -ls->wi);
+                            real const shadow_distance = glm::length(shadow_target - shadow_origin);
+                            
+                            HitRecord shadow_hit;
+                            if (!world.hit(Ray(shadow_origin, ls->wi), Interval { 0.0, shadow_distance }, shadow_hit)) {
+                                real const pdf_bsdf = material.pdf(wo_world, ls->wi, record);
+                                real const mis_w = power_heuristic(ls->pdf, pdf_bsdf);
+                                real const cos_theta_i = std::abs(glm::dot(record.normal, ls->wi));
+
+                                radiance += throughput * f_bsdf * ls->emission * ((cos_theta_i * mis_w) / ls->pdf);
+                            }
+                        }
+                    }
+                }
+
+                real const u_sky_lobe = sampler.sample_1d();
+                vec2 const u_sky_dir = sampler.sample_2d();
+
+                if (auto const ss = m_sky->sample(u_sky_lobe, u_sky_dir); ss.has_value() && ss->pdf > 0.0) {
+                    vec3 const f_bsdf = material.eval(wo_world, ss->wi, record);
+
                     if (f_bsdf.x > 0.0 || f_bsdf.y > 0.0 || f_bsdf.z > 0.0) {
-                        vec3 const shadow_origin = offset_ray_origin(record.point, record.normal, ls->wi);
-                        vec3 const shadow_target = offset_ray_origin(ls->point, ls->normal, -ls->wi);
-                        real const shadow_distance = glm::length(shadow_target - shadow_origin);
+                        vec3 const shadow_origin = offset_ray_origin(record.point, record.normal, ss->wi);
 
                         HitRecord shadow_hit;
-                        if (!world.hit(Ray(shadow_origin, ls->wi), Interval { 0.0, shadow_distance }, shadow_hit)) {
-                            real const pdf_bsdf = record.material->pdf(wo_world, ls->wi, record);
-                            real const mis_w = power_heuristic(ls->pdf, pdf_bsdf);
-                            real const cos_theta_i = std::abs(glm::dot(record.normal, ls->wi));
+                        if (!world.hit(Ray(shadow_origin, ss->wi), Interval { 0.0, std::numeric_limits<real>::infinity() }, shadow_hit)) {
+                            real const pdf_bsdf = material.pdf(wo_world, ss->wi, record);
+                            real const mis_w = power_heuristic(ss->pdf, pdf_bsdf);
+                            real const cos_theta_i = std::abs(glm::dot(record.normal, ss->wi));
 
-                            radiance += throughput * f_bsdf * ls->emission * ((cos_theta_i * mis_w) / ls->pdf);
+                            radiance += throughput * f_bsdf * ss->radiance * ((cos_theta_i * mis_w) / ss->pdf);
                         }
                     }
                 }
             }
 
-            real const u_sky_lobe = sampler.sample_1d();
-            vec2 const u_sky_dir = sampler.sample_2d();
-
-            if (auto const ss = m_sky->sample(u_sky_lobe, u_sky_dir); ss.has_value() && ss->pdf > 0.0) {
-                vec3 const f_bsdf = record.material->eval(wo_world, ss->wi, record);
-                if (f_bsdf.x > 0.0 || f_bsdf.y > 0.0 || f_bsdf.z > 0.0) {
-                    vec3 const shadow_origin = offset_ray_origin(record.point, record.normal, ss->wi);
-
-                    HitRecord shadow_hit;
-                    if (!world.hit(Ray(shadow_origin, ss->wi), Interval { 0.0, std::numeric_limits<real>::infinity() }, shadow_hit)) {
-                        real const pdf_bsdf = record.material->pdf(wo_world, ss->wi, record);
-                        real const mis_w = power_heuristic(ss->pdf, pdf_bsdf);
-                        real const cos_theta_i = std::abs(glm::dot(record.normal, ss->wi));
-
-                        radiance += throughput * f_bsdf * ss->radiance * ((cos_theta_i * mis_w) / ss->pdf);
-                    }
-                }
-            }
-
             MaterialSample const sample = MaterialSample::from(sampler);
-            auto const bsdf = record.material->sample(r, record, sample);
+            auto const bsdf = material.sample(r, record, sample);
             if (!bsdf.has_value()) break;
 
             throughput *= bsdf->weight;

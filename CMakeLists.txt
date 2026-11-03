@@ -27,10 +27,11 @@ add_executable(${PROJECT_NAME}
     ${CMAKE_CURRENT_SOURCE_DIR}/src/hittable/hittable.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/hittable/hittable_list.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/hittable/hittable_list.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/hittable/bvh.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/hittable/bvh.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/hittable/sphere.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/hittable/sphere.cpp
+
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/acceleration/bvh.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/acceleration/bvh.cpp
 
     ${CMAKE_CURRENT_SOURCE_DIR}/src/sky/sky.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/sky/hosek_wilkie_data.hpp

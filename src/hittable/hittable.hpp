@@ -9,7 +9,7 @@
 
 namespace rtweekend {
 
-    class Material;
+    class PrincipledBSDF;
 
     struct HitRecord
     {
@@ -19,7 +19,7 @@ namespace rtweekend {
         real distance { 0.0 };
         bool front_face { false };
 
-        std::shared_ptr<Material> material;
+        const PrincipledBSDF* material { nullptr };
 
         inline auto set_normal(const Ray& r, const vec3& n, const vec3& t = vec3(0.0)) -> void
         {

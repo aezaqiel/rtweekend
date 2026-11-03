@@ -1,7 +1,7 @@
 #pragma once
 
-#include "hittable.hpp"
-#include "hittable_list.hpp"
+#include "hittable/hittable.hpp"
+#include "hittable/hittable_list.hpp"
 
 namespace rtweekend {
 
